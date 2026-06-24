@@ -5,8 +5,9 @@
   export let userLocation = null;
   export let pois = [];
   export let threshold = 50;
-  export let activeLabel = 'Jetzt einchecken';
-  export let inactiveLabel = 'Check-in nicht verfügbar';
+  export let activeLabel = 'Check in now';
+  export let inactiveLabel = 'Check-in unavailable';
+  export let formatDistanceLabel = (distance) => `Still ${Math.round(distance)}m away`;
 
   const dispatch = createEventDispatcher();
 
@@ -41,7 +42,7 @@
   $: buttonLabel = isActive
     ? activeLabel
     : Number.isFinite(distanceToNearest)
-      ? `Noch ${Math.round(distanceToNearest)}m entfernt`
+      ? formatDistanceLabel(distanceToNearest)
       : inactiveLabel;
 
   $: if (isActive !== wasActive) {

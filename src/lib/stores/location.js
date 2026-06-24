@@ -8,20 +8,33 @@ const initialState = {
   error: null
 };
 
+const defaultMessages = {
+  permissionDenied: 'Location access denied.',
+  unavailable: 'Location is currently unavailable.',
+  timeout: 'Location request timed out.',
+  unknown: 'Unknown geolocation error.',
+  unsupported: 'Geolocation is not supported on this device.'
+};
+
 const state = writable(initialState);
 let watchId = null;
+let messages = { ...defaultMessages };
 
 const geolocationErrorMessage = (error) => {
   switch (error?.code) {
     case 1:
-      return 'Standortzugriff verweigert.';
+      return messages.permissionDenied;
     case 2:
-      return 'Standort momentan nicht verfügbar.';
+      return messages.unavailable;
     case 3:
-      return 'Standortabfrage hat zu lange gedauert.';
+      return messages.timeout;
     default:
-      return 'Unbekannter Geolokalisierungsfehler.';
+      return messages.unknown;
   }
+};
+
+const setMessages = (overrides = {}) => {
+  messages = { ...defaultMessages, ...overrides };
 };
 
 const start = (options = {}) => {
@@ -31,7 +44,7 @@ const start = (options = {}) => {
     state.set({
       ...initialState,
       status: 'error',
-      error: 'Geolocation wird von diesem Gerät nicht unterstützt.'
+      error: messages.unsupported
     });
     return;
   }
@@ -82,7 +95,8 @@ const location = {
   subscribe: state.subscribe,
   start,
   stop,
-  reset
+  reset,
+  setMessages
 };
 
 export default location;
