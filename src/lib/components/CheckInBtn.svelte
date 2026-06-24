@@ -44,11 +44,12 @@
       ? `Noch ${Math.round(distanceToNearest)}m entfernt`
       : inactiveLabel;
 
-  $: if (isActive && !wasActive && typeof navigator !== 'undefined' && navigator.vibrate) {
-    navigator.vibrate(120);
+  $: if (isActive !== wasActive) {
+    if (isActive && typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(120);
+    }
+    wasActive = isActive;
   }
-
-  $: wasActive = isActive;
 
   const handleClick = () => {
     if (!isActive || !nearestPoi) return;
