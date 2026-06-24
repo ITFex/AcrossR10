@@ -15,6 +15,10 @@
   let isActive = false;
   let wasActive = false;
   let buttonLabel = inactiveLabel;
+  const normalizeCoordinates = (poi) => ({
+    latitude: poi?.latitude ?? poi?.lat,
+    longitude: poi?.longitude ?? poi?.lng ?? poi?.lon
+  });
 
   $: {
     nearestPoi = null;
@@ -22,11 +26,7 @@
 
     if (userLocation && Array.isArray(pois)) {
       for (const poi of pois) {
-        const candidate = {
-          latitude: poi?.latitude ?? poi?.lat,
-          longitude: poi?.longitude ?? poi?.lng ?? poi?.lon
-        };
-
+        const candidate = normalizeCoordinates(poi);
         const distance = haversineDistanceMeters(userLocation, candidate);
 
         if (distance < distanceToNearest) {

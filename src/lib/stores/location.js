@@ -70,8 +70,9 @@ const start = (options = {}) => {
 
 const stop = () => {
   if (!browser || watchId === null) return;
-  navigator.geolocation.clearWatch(watchId);
+  const currentWatchId = watchId;
   watchId = null;
+  navigator.geolocation.clearWatch(currentWatchId);
   state.update((current) => ({ ...current, status: 'idle', error: null }));
 };
 
