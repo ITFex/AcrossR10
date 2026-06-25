@@ -66,6 +66,10 @@ const start = (options = {}) => {
       });
     },
     (error) => {
+      if (error?.code === 1 && watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
       state.update((current) => ({
         ...current,
         status: 'error',

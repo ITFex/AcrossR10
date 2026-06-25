@@ -12,6 +12,8 @@
 
   let checkedInPoi = null;
   let checkedInAt = null;
+  let userCoords = null;
+  let nearest = null;
 
   $: userCoords = $location.coords;
   $: nearest = findNearestPoi(userCoords, pois);

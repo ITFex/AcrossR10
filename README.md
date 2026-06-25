@@ -1,24 +1,13 @@
 # AcrossR10
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A SvelteKit-based mobile geofencing check-in app for cyclists.
 
-## Creating a project
+## Prerequisites
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Node.js `^20.19.0 || >=22.12.0`
+- npm
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-npx sv@0.16.1 create --template minimal --types jsdoc --install npm .
-```
-
-## Developing
+## Development
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
@@ -29,14 +18,18 @@ npm run dev
 npm run dev -- --open
 ```
 
-## Building
+The app starts location tracking on load and enables check-in when the current position is within range of configured POIs.
 
-To create a production version of your app:
+## Validation
+
+```sh
+npm run check
+```
+
+## Build
 
 ```sh
 npm run build
 ```
 
 You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
