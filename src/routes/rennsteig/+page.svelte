@@ -1,15 +1,16 @@
 <script>
   import MapPreview3D from '$lib/components/MapPreview3D.svelte';
+  import GpxTrackCard from '$lib/components/GpxTrackCard.svelte';
 
   const routeStats = [
-    { label: 'DISTANCE', value: '169.3 km' },
-    { label: 'DAYS', value: '2-4' },
+    { label: 'DISTANCE', value: 'ca. 58 km (Sample-Race)' },
+    { label: 'DAYS', value: '1' },
     { label: '% UNPAVED', value: '62%' },
     { label: '% SINGLETRACK', value: '18%' },
     { label: '% RIDEABLE', value: '96%' },
-    { label: 'TOTAL ASCENT', value: '3,120 m' },
-    { label: 'HIGH POINT', value: '973 m' },
-    { label: 'DIFFICULTY', value: '6 / 10' }
+    { label: 'TOTAL ASCENT', value: 'ca. 1,250 m' },
+    { label: 'HIGH POINT', value: 'ca. 915 m' },
+    { label: 'DIFFICULTY', value: '5 / 10' }
   ];
 
   const routeScale = [
@@ -44,16 +45,16 @@
   ];
 
   const highlights = [
-    'Lange Kammabschnitte mit flussigem Rhythmus und weiten Waldpanoramen',
-    'Historische Rennsteig-Orte mit dichter Einkehr- und Brunnenstruktur',
-    'Kombinierbar als Overnighter, Wochenende oder 4-Tage-Etappenroute',
-    'Mehrere Bahnhofsoptionen fur flexible Start-/Zielplanung'
+    'Eintagiges Rennformat mit frei wahlbarer Startzeit innerhalb des Eventfensters',
+    'Teilnahme solo oder in selbst organisierter Kleingruppe moglich',
+    'Markante Punkte wie Burg Elgersburg, Mönchhof und Aussichtspassagen',
+    'Technisch moderat mit hoher Fahrfrequenz auf wechselnden Walduntergrunden'
   ];
 
   const mustKnow = [
-    'Bei Dauerregen entstehen tiefe, weiche Forstspuren, besonders im Ostteil.',
-    'Nebel auf den Kammlagen kann Sicht und Orientierung stark reduzieren.',
-    'Einige Segmente sind stark frequentiert; defensives Fahren in Wanderzonen.',
+    'Die Veranstaltung ist als One-Day-Race geplant: kein offizieller Massenstart.',
+    'Jede Person oder Gruppe fahrt in Eigenverantwortung mit eigener Navigation.',
+    'Tracknachweis uber GPX-Aufzeichnung (z. B. Bikecomputer/Komoot/Garmin).',
     'Offline-Karte + GPX sind auf Teilstucken ohne stabiles Netz Pflicht.'
   ];
 
@@ -72,6 +73,77 @@
       title: 'Ostteil: Neuhaus -> Blankenstein',
       profile: 'Flüssigeres Terrain mit schnellen Abschnitten und Ortsdurchfahrten.',
       hint: 'Auf touristischen Teilstücken frühzeitig Geschwindigkeit anpassen.'
+    }
+  ];
+
+  const raceOrga = [
+    {
+      title: 'Startfenster',
+      text: 'Empfohlenes Startfenster 06:00-10:00 Uhr, damit alle vor Einbruch der Dunkelheit im Ziel sind.'
+    },
+    {
+      title: 'Teilnahmeformat',
+      text: 'Solo oder als selbst organisierte Gruppe (2-8 Personen) mit gemeinsamer Sicherheitsabsprache.'
+    },
+    {
+      title: 'Wertungsidee',
+      text: 'Finisher-Event: Ziel ist die komplette Strecke in einem Tag. Optional Ranking nach Nettofahrzeit.'
+    },
+    {
+      title: 'Sicherheit',
+      text: 'Helm, Licht, Erste-Hilfe-Basics, Mobilakku und Notfallkontakt sind verpflichtend empfohlen.'
+    }
+  ];
+
+  const faqItems = [
+    {
+      q: 'Kann ich auch allein starten?',
+      a: 'Ja. Das Event ist explizit fur Solo-Starts und Gruppenstarts ohne zentrale Formation ausgelegt.'
+    },
+    {
+      q: 'Darf ich in einer spontanen Gruppe fahren?',
+      a: 'Ja. Gruppen konnen sich selbst organisieren. Tempo, Pausen und Navigation werden eigenstandig abgestimmt.'
+    },
+    {
+      q: 'Wie wird die absolvierte Strecke nachgewiesen?',
+      a: 'Uber eine durchgehende GPX-Aufzeichnung plus Zieleintrag im Event-Check-in.'
+    },
+    {
+      q: 'Gibt es eine Abbruchstrategie?',
+      a: 'Ja. Mehrere Orte entlang der Strecke haben Taxi-/Bahn-/Busoptionen fur einen sicheren Ruckweg.'
+    }
+  ];
+
+  const aidStations = [
+    {
+      name: 'Gasthaus Mönchhof',
+      type: 'Einkehr / Wasser / warme Speisen',
+      hint: 'Sinnvoller Mid-Race-Stopp im westlichen Mittelteil.'
+    },
+    {
+      name: 'Schmiedefeld am Rennsteig',
+      type: 'Bäcker / Markt / Gastronomie',
+      hint: 'Sehr guter Vor- und Nachversorgungs-Hub mit kurzer Distanz zu Unterkunften.'
+    },
+    {
+      name: 'Elgersburg (Ortsbereich)',
+      type: 'Nahversorgung / Brunnen / Gastro',
+      hint: 'Flexible Nachfulloption kurz vor den langere Waldpassagen.'
+    }
+  ];
+
+  const accommodations = [
+    {
+      area: 'Schmiedefeld am Rennsteig',
+      text: 'Ideal als Race-Base fur Anreise am Vortag und Regeneration nach dem Zieleinlauf.'
+    },
+    {
+      area: 'Oberhof',
+      text: 'Gute Auswahl an Hotels/Pensionen, geeignet fur Teams oder Begleitpersonen.'
+    },
+    {
+      area: 'Neuhaus am Rennweg',
+      text: 'Ruhigere Alternative mit guter Erreichbarkeit fur pre-/post-race Ubernachtung.'
     }
   ];
 
@@ -114,10 +186,11 @@
 <main>
   <header class="hero">
     <p class="meta-line">LOCATION THURINGIA, GERMANY</p>
-    <h1>Rennsteig Traverse</h1>
+    <h1>Rennsteig One-Day Race</h1>
     <p class="dek">
-      Vom westlichen Kammeinstieg bei Horschel bis nach Blankenstein: Diese Route kombiniert lange
-      Waldlinien, moderate Technik und starke Etappenflexibilitat in einem klassischen Mittelgebirgs-Setup.
+      Das Event ist als eintagiges Rennen gestaltet und kann individuell solo oder in selbst
+      organisierten Gruppen gefahren werden. Der bereitgestellte GPX-Track bildet die verbindliche
+      Rennlinie fur Navigation und Nachweis.
     </p>
     <figure class="hero-art">
       <img
@@ -140,9 +213,9 @@
     <article class="narrative">
       <h2>Route Difficulty</h2>
       <p>
-        Der Rennsteig bleibt fahrtechnisch meist kontrollierbar, fordert aber durch Distanz,
-        wechselnde Untergrunde und wiederkehrende Anstiege ein solides Tempo-Management. Wer das
-        Ganze als Overnighter plant, sollte Reserven fur Wetterwechsel und Navigation einbauen.
+        Das One-Day-Race ist fahrtechnisch moderat, konditionell jedoch anspruchsvoll durch Dauer,
+        Hohenmeter und wechselnde Bodenverhaltnisse. Gute Pacing-Strategie und verlassliche
+        Eigenverpflegung machen den Unterschied im letzten Renndrittel.
       </p>
 
       <div class="scale-grid">
@@ -181,10 +254,40 @@
       </div>
 
       <h2>Map & GPS</h2>
+      <GpxTrackCard
+        gpxPath="/rennsteig-race.gpx"
+        title="GPX Beispieltrack: Burg Elgersburg - Gasthaus Mönchhof Runde"
+      />
+
       <MapPreview3D title="3D Map Vorschau der Strecke" points={rennsteigPreviewPoints} />
+
+      <p>
+        Download des Original-GPX:
+        <a class="inline-link" href="/rennsteig-race.gpx" download>rennsteig-race.gpx</a>
+      </p>
+
+      <h2>Organisation</h2>
+      <div class="faq-list">
+        {#each raceOrga as item}
+          <article class="faq-item">
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        {/each}
+      </div>
 
       <div class="split-list">
         <section>
+          <h3>Übernachtungsmöglichkeiten</h3>
+          <div class="faq-list">
+            {#each accommodations as place}
+              <article class="faq-item">
+                <h4>{place.area}</h4>
+                <p>{place.text}</p>
+              </article>
+            {/each}
+          </div>
+
           <h3>Camping / Unterkunft</h3>
           <ul class="text-list compact">
             {#each camping as item}
@@ -194,6 +297,17 @@
         </section>
 
         <section>
+          <h3>Verpflegungsstationen</h3>
+          <div class="faq-list">
+            {#each aidStations as station}
+              <article class="faq-item">
+                <h4>{station.name}</h4>
+                <p><strong>Typ:</strong> {station.type}</p>
+                <p>{station.hint}</p>
+              </article>
+            {/each}
+          </div>
+
           <h3>Food / H2O</h3>
           <ul class="text-list compact">
             {#each foodAndWater as item}
@@ -209,6 +323,16 @@
           <li>{item}</li>
         {/each}
       </ul>
+
+      <h2>FAQ</h2>
+      <div class="faq-list">
+        {#each faqItems as item}
+          <article class="faq-item">
+            <h3>{item.q}</h3>
+            <p>{item.a}</p>
+          </article>
+        {/each}
+      </div>
 
       <h2>Photo Gallery</h2>
       <div class="gallery-grid">
@@ -442,6 +566,25 @@
   .split-list {
     display: grid;
     gap: 0.8rem;
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .faq-item {
+    border: 1px dashed #ccb693;
+    border-radius: 0.65rem;
+    background: rgba(245, 238, 227, 0.9);
+    padding: 0.65rem;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .inline-link {
+    color: #6a4526;
+    font-weight: 700;
   }
 
   .gallery-grid {
