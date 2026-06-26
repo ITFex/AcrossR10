@@ -1,7 +1,28 @@
 <script>
+  import { locale } from '$lib/stores/i18n';
+
   export let members = [];
   export let routeMarkers = [];
   export let selfMemberId = '';
+
+  const copy = {
+    de: {
+      sectionLabel: 'Live-Tracking Karte',
+      title: 'Live-Tracking',
+      activeMembers: 'Mitglieder mit aktiver Position',
+      mapLabel: 'Karte mit Live-Positionen',
+      empty: 'Noch keine Live-Positionen verfügbar.'
+    },
+    en: {
+      sectionLabel: 'Live tracking map',
+      title: 'Live Tracking',
+      activeMembers: 'members with active position',
+      mapLabel: 'Map with live positions',
+      empty: 'No live positions available yet.'
+    }
+  };
+
+  $: t = copy[$locale] ?? copy.de;
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -55,14 +76,14 @@
     .filter(Boolean);
 </script>
 
-<section class="live-map" aria-label="Live Tracking Karte">
+<section class="live-map" aria-label={t.sectionLabel}>
   <header>
-    <h3>Live Tracking</h3>
-    <p>{memberDots.length} Mitglieder mit aktiver Position</p>
+    <h3>{t.title}</h3>
+    <p>{memberDots.length} {t.activeMembers}</p>
   </header>
 
   {#if bounds && (memberDots.length > 0 || markerDots.length > 0)}
-    <svg viewBox="0 0 100 100" role="img" aria-label="Karte mit Live Positionen">
+    <svg viewBox="0 0 100 100" role="img" aria-label={t.mapLabel}>
       <rect x="2" y="2" width="96" height="96" rx="9" class="ground" />
 
       {#each markerDots as marker}
@@ -84,7 +105,7 @@
       {/each}
     </svg>
   {:else}
-    <p class="empty">Noch keine Live-Positionen verfügbar.</p>
+    <p class="empty">{t.empty}</p>
   {/if}
 </section>
 

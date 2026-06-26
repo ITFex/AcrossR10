@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import LiveTrackingMap from '$lib/components/LiveTrackingMap.svelte';
   import memberTracking from '$lib/stores/memberTracking';
+  import { locale } from '$lib/stores/i18n';
 
   const ACCESS_CODE = 'ACROSSR10-MEMBER';
   const ACCESS_KEY = 'acrossr10.member-access';
@@ -29,6 +30,67 @@
   let isAuthorized = false;
   let selfMemberId = '';
 
+  const copy = {
+    de: {
+      internalArea: 'Interner Bereich',
+      title: 'Mitglieder Live-Tracking',
+      accessOnly: 'Zugang nur mit internem Mitgliedercode.',
+      accessCodeLabel: 'Zugangscode',
+      accessCodePlaceholder: 'Code eingeben',
+      openArea: 'Bereich öffnen',
+      invalidCode: 'Ungültiger Zugangscode.',
+      demoCode: 'Demo-Code',
+      memberArea: 'Mitgliederbereich',
+      liveTrackingTitle: 'Live-Tracking der Mitglieder',
+      realtimeHint: 'Positionen werden in Supabase Realtime synchronisiert.',
+      activePositions: 'Aktive Positionen',
+      totalMembers: 'Gesamt-Mitglieder',
+      realtimeConnect: 'Realtime-Verbindung wird aufgebaut...',
+      lockArea: 'Bereich sperren',
+      memberStatus: 'Mitgliederstatus',
+      you: 'Du',
+      active: 'Aktiv',
+      inactive: 'Inaktiv',
+      lastSeen: 'Zuletzt',
+      gps: 'GPS',
+      noMembers: 'Noch keine Mitglieder im Live-Tracking.',
+      justNow: 'gerade eben',
+      seconds: 's',
+      minutes: 'min',
+      hours: 'h'
+    },
+    en: {
+      internalArea: 'Internal area',
+      title: 'Member Live Tracking',
+      accessOnly: 'Access with internal member code only.',
+      accessCodeLabel: 'Access code',
+      accessCodePlaceholder: 'Enter code',
+      openArea: 'Open area',
+      invalidCode: 'Invalid access code.',
+      demoCode: 'Demo code',
+      memberArea: 'Member area',
+      liveTrackingTitle: 'Live tracking of members',
+      realtimeHint: 'Positions are synchronized via Supabase Realtime.',
+      activePositions: 'Active positions',
+      totalMembers: 'Total members',
+      realtimeConnect: 'Establishing realtime connection...',
+      lockArea: 'Lock area',
+      memberStatus: 'Member status',
+      you: 'You',
+      active: 'Active',
+      inactive: 'Inactive',
+      lastSeen: 'Last seen',
+      gps: 'GPS',
+      noMembers: 'No members in live tracking yet.',
+      justNow: 'just now',
+      seconds: 's',
+      minutes: 'min',
+      hours: 'h'
+    }
+  };
+
+  $: t = copy[$locale] ?? copy.de;
+
   $: members = ($memberTracking.members || []).sort(
     (a, b) => new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime()
   );
@@ -46,7 +108,7 @@
 
   const submitCode = () => {
     if (enteredCode.trim().toUpperCase() !== ACCESS_CODE) {
-      gateError = 'Ungültiger Zugangscode.';
+      gateError = t.invalidCode;
       return;
     }
 
@@ -67,64 +129,64 @@
 
   const toRelativeTime = (isoDate) => {
     const ms = Date.now() - new Date(isoDate).getTime();
-    if (!Number.isFinite(ms) || ms < 0) return 'gerade eben';
+    if (!Number.isFinite(ms) || ms < 0) return t.justNow;
 
     const seconds = Math.round(ms / 1000);
-    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 60) return `${seconds}${t.seconds}`;
 
     const minutes = Math.round(seconds / 60);
-    if (minutes < 60) return `${minutes}min`;
+    if (minutes < 60) return `${minutes}${t.minutes}`;
 
     const hours = Math.round(minutes / 60);
-    return `${hours}h`;
+    return `${hours}${t.hours}`;
   };
 </script>
 
 <main>
   {#if !isAuthorized}
     <section class="panel auth-panel">
-      <p class="kicker">Interner Bereich</p>
-      <h1>Mitglieder LiveTracking</h1>
-      <p>Zugang nur mit internem Mitgliedercode.</p>
+      <p class="kicker">{t.internalArea}</p>
+      <h1>{t.title}</h1>
+      <p>{t.accessOnly}</p>
 
-      <label for="member-code">Zugangscode</label>
+      <label for="member-code">{t.accessCodeLabel}</label>
       <input
         id="member-code"
         type="password"
-        placeholder="Code eingeben"
+        placeholder={t.accessCodePlaceholder}
         value={enteredCode}
         on:input={(event) => (enteredCode = event.currentTarget.value)}
       />
-      <button class="btn" on:click={submitCode}>Bereich öffnen</button>
+      <button class="btn" on:click={submitCode}>{t.openArea}</button>
 
       {#if gateError}
         <p class="error">{gateError}</p>
       {/if}
 
-      <p class="subtle">Demo-Code: {ACCESS_CODE}</p>
+      <p class="subtle">{t.demoCode}: {ACCESS_CODE}</p>
     </section>
   {:else}
     <header class="panel hero-panel">
-      <p class="kicker">Mitgliederbereich</p>
-      <h1>LiveTracking der Mitglieder</h1>
-      <p>Positionen werden in Supabase Realtime synchronisiert.</p>
+      <p class="kicker">{t.memberArea}</p>
+      <h1>{t.liveTrackingTitle}</h1>
+      <p>{t.realtimeHint}</p>
       <div class="meta">
-        <span>Aktive Positionen: {members.filter((m) => m.status === 'active').length}</span>
-        <span>Gesamt-Mitglieder: {members.length}</span>
+        <span>{t.activePositions}: {members.filter((m) => m.status === 'active').length}</span>
+        <span>{t.totalMembers}: {members.length}</span>
       </div>
       {#if $memberTracking.error}
         <p class="error">{$memberTracking.error}</p>
       {:else if !$memberTracking.ready}
-        <p class="subtle">Realtime-Verbindung wird aufgebaut...</p>
+        <p class="subtle">{t.realtimeConnect}</p>
       {/if}
-      <button class="lock" on:click={lockArea}>Bereich sperren</button>
+      <button class="lock" on:click={lockArea}>{t.lockArea}</button>
     </header>
 
     <section class="grid">
       <LiveTrackingMap members={members} {routeMarkers} {selfMemberId} />
 
       <article class="panel list-panel">
-        <h2>Mitgliederstatus</h2>
+        <h2>{t.memberStatus}</h2>
         {#if members.length > 0}
           <ul class="members-list">
             {#each members as member}
@@ -133,22 +195,22 @@
                   <strong>
                     {member.name}
                     {#if member.id === selfMemberId}
-                      (Du)
+                      ({t.you})
                     {/if}
                   </strong>
-                  <p>{member.status === 'active' ? 'Aktiv' : 'Inaktiv'}</p>
+                  <p>{member.status === 'active' ? t.active : t.inactive}</p>
                 </div>
                 <div class="right">
-                  <p>Zuletzt: {toRelativeTime(member.lastSeen)}</p>
+                  <p>{t.lastSeen}: {toRelativeTime(member.lastSeen)}</p>
                   {#if member.accuracy}
-                    <p>GPS: ±{member.accuracy}m</p>
+                    <p>{t.gps}: ±{member.accuracy}m</p>
                   {/if}
                 </div>
               </li>
             {/each}
           </ul>
         {:else}
-          <p>Noch keine Mitglieder im LiveTracking.</p>
+          <p>{t.noMembers}</p>
         {/if}
       </article>
     </section>

@@ -4,6 +4,7 @@
   import location from '$lib/stores/location';
   import leaderboard from '$lib/stores/leaderboard';
   import memberTracking from '$lib/stores/memberTracking';
+  import { locale } from '$lib/stores/i18n';
   import { haversineDistanceMeters } from '$lib/utils/haversine';
 
   const GEOFENCE_RADIUS_METERS = 50;
@@ -24,6 +25,90 @@
   let riderName = '';
   let riderHint = '';
   let scorePreview = 100;
+
+  const copy = {
+    de: {
+      title: 'Live Check-in',
+      subtitle: 'Standortdaten prüfen, nächsten POI finden und in der Geofence-Zone einchecken.',
+      geofenceRadius: 'Geofence-Radius',
+      scorePreview: 'Vorschau Punkte',
+      riderProfile: 'Fahrerprofil',
+      riderNameLabel: 'Name für die ewige Bestenliste',
+      riderNamePlaceholder: 'z. B. Lena, Markus, Team Waldritt',
+      riderNameHint: 'Der Name bleibt lokal gespeichert und wird für alle kommenden Check-ins genutzt.',
+      location: 'Standort',
+      lat: 'Lat',
+      lon: 'Lon',
+      accuracy: 'Genauigkeit',
+      waitingGps: 'Warte auf GPS-Signal...',
+      nearestPoi: 'Nächster POI',
+      distanceAway: 'entfernt',
+      inGeofence: 'Du bist im Geofence (Radius {radius}m).',
+      outsideGeofence: 'Außerhalb des Geofence-Radius ({radius}m).',
+      noPoi: 'Kein POI verfügbar.',
+      checkin: 'Check-in',
+      activeCheckin: 'Jetzt einchecken',
+      inactiveCheckin: 'Check-in nicht verfügbar',
+      stillAway: 'Noch {distance}m entfernt',
+      checkedInAt: 'Eingecheckt bei {poi} am {date} um {time}',
+      history: 'Check-in Historie',
+      distance: 'Distanz',
+      noHistory: 'Noch keine Meldungen erfasst.',
+      scoreInfo: 'Wertung und weitere Infos',
+      scoreNotes: [
+        'Jeder Check-in bringt Punkte auf Basis der Distanz zum POI (nah = mehr Punkte).',
+        'Die ewige Bestenliste summiert alle Punkte und Check-ins dauerhaft.',
+        'Bei Punktgleichheit entscheidet zuerst die Anzahl der Check-ins, dann der Name.',
+        'Die Auswertung findest du in der Rubrik Bestenliste.'
+      ],
+      gotoLeaderboard: 'Zur ewigen Bestenliste',
+      hintNameFirst: 'Bitte zuerst einen Fahrernamen eingeben, damit Punkte in die ewige Bestenliste zählen.',
+      hintPointsCollected: '{name} hat Punkte für die ewige Bestenliste gesammelt.'
+    },
+    en: {
+      title: 'Live Check-in',
+      subtitle: 'Check location data, find the nearest POI and check in within the geofence.',
+      geofenceRadius: 'Geofence radius',
+      scorePreview: 'Points preview',
+      riderProfile: 'Rider profile',
+      riderNameLabel: 'Name for the all-time leaderboard',
+      riderNamePlaceholder: 'e.g. Lena, Markus, Team Forest Ride',
+      riderNameHint: 'Your name is stored locally and used for future check-ins.',
+      location: 'Location',
+      lat: 'Lat',
+      lon: 'Lon',
+      accuracy: 'Accuracy',
+      waitingGps: 'Waiting for GPS signal...',
+      nearestPoi: 'Nearest POI',
+      distanceAway: 'away',
+      inGeofence: 'You are inside the geofence (radius {radius}m).',
+      outsideGeofence: 'Outside geofence radius ({radius}m).',
+      noPoi: 'No POI available.',
+      checkin: 'Check-in',
+      activeCheckin: 'Check in now',
+      inactiveCheckin: 'Check-in unavailable',
+      stillAway: '{distance}m away',
+      checkedInAt: 'Checked in at {poi} on {date} at {time}',
+      history: 'Check-in history',
+      distance: 'Distance',
+      noHistory: 'No check-ins recorded yet.',
+      scoreInfo: 'Scoring and details',
+      scoreNotes: [
+        'Each check-in awards points based on distance to the POI (closer = more points).',
+        'The all-time leaderboard accumulates points and check-ins permanently.',
+        'If points are tied, check-in count comes first, then name.',
+        'You can view the evaluation in the leaderboard section.'
+      ],
+      gotoLeaderboard: 'Go to all-time leaderboard',
+      hintNameFirst: 'Please enter a rider name first so points can be counted on the leaderboard.',
+      hintPointsCollected: '{name} collected points for the all-time leaderboard.'
+    }
+  };
+
+  const formatText = (text, values = {}) =>
+    text.replace(/\{(\w+)\}/g, (_, key) => (values[key] ?? '').toString());
+
+  $: t = copy[$locale] ?? copy.de;
 
   $: userCoords = $location.coords;
   $: nearest = findNearestPoi(userCoords, pois);
@@ -112,7 +197,7 @@
     ];
 
     if (!normalizedName) {
-      riderHint = 'Bitte zuerst einen Fahrernamen eingeben, damit Punkte in die ewige Bestenliste zählen.';
+      riderHint = t.hintNameFirst;
       return;
     }
 
@@ -123,112 +208,116 @@
       timestamp
     });
 
-    riderHint = `${normalizedName} hat Punkte für die ewige Bestenliste gesammelt.`;
+    riderHint = formatText(t.hintPointsCollected, { name: normalizedName });
   }
 </script>
 
 <main>
   <header class="panel panel-hero">
-    <h1>Live Check-in</h1>
-    <p>Standortdaten prüfen, nächsten POI finden und in der Geofence-Zone einchecken.</p>
+    <h1>{t.title}</h1>
+    <p>{t.subtitle}</p>
     <div class="hero-meta">
-      <span>Geofence-Radius: {GEOFENCE_RADIUS_METERS} m</span>
-      <span>Vorschau Punkte: {scorePreview}</span>
+      <span>{t.geofenceRadius}: {GEOFENCE_RADIUS_METERS} m</span>
+      <span>{t.scorePreview}: {scorePreview}</span>
     </div>
   </header>
 
   <section class="panel panel-identity">
-    <h2>Fahrerprofil</h2>
-    <label for="rider-name">Name für die ewige Bestenliste</label>
+    <h2>{t.riderProfile}</h2>
+    <label for="rider-name">{t.riderNameLabel}</label>
     <input
       id="rider-name"
       type="text"
-      placeholder="z. B. Lena, Markus, Team Waldritt"
+      placeholder={t.riderNamePlaceholder}
       value={riderName}
       on:input={(event) => saveRiderName(event.currentTarget.value)}
     />
-    <p class="subtle">Der Name bleibt lokal gespeichert und wird für alle kommenden Check-ins genutzt.</p>
+    <p class="subtle">{t.riderNameHint}</p>
     {#if riderHint}
       <p class="inside">{riderHint}</p>
     {/if}
   </section>
 
   <section class="panel">
-    <h2>Standort</h2>
+    <h2>{t.location}</h2>
     {#if $location.error}
       <p class="error">{$location.error}</p>
     {:else if userCoords}
-      <p>Lat: {userCoords.latitude.toFixed(5)}</p>
-      <p>Lon: {userCoords.longitude.toFixed(5)}</p>
-      <p>Genauigkeit: {Math.round($location.accuracy ?? 0)}m</p>
+      <p>{t.lat}: {userCoords.latitude.toFixed(5)}</p>
+      <p>{t.lon}: {userCoords.longitude.toFixed(5)}</p>
+      <p>{t.accuracy}: {Math.round($location.accuracy ?? 0)}m</p>
     {:else}
-      <p>Warte auf GPS-Signal...</p>
+      <p>{t.waitingGps}</p>
     {/if}
   </section>
 
   <section class="panel">
-    <h2>Nächster POI</h2>
+    <h2>{t.nearestPoi}</h2>
     {#if nearest}
       <p>{nearest.poi.name}</p>
-      <p>{Math.round(nearest.distance)}m entfernt</p>
+      <p>{Math.round(nearest.distance)}m {t.distanceAway}</p>
       <p class:inside={isInsideGeofence} class:outside={!isInsideGeofence}>
         {#if isInsideGeofence}
-          Du bist im Geofence (Radius {GEOFENCE_RADIUS_METERS}m).
+          {formatText(t.inGeofence, { radius: GEOFENCE_RADIUS_METERS })}
         {:else}
-          Außerhalb des Geofence-Radius ({GEOFENCE_RADIUS_METERS}m).
+          {formatText(t.outsideGeofence, { radius: GEOFENCE_RADIUS_METERS })}
         {/if}
       </p>
     {:else}
-      <p>Kein POI verfügbar.</p>
+      <p>{t.noPoi}</p>
     {/if}
   </section>
 
   <section class="panel">
-    <h2>Check-in</h2>
+    <h2>{t.checkin}</h2>
     <CheckInBtn
       userLocation={userCoords}
       {pois}
       threshold={GEOFENCE_RADIUS_METERS}
-      activeLabel="Jetzt einchecken"
-      inactiveLabel="Check-in nicht verfügbar"
-      formatDistanceLabel={(distance) => `Noch ${Math.round(distance)}m entfernt`}
+      activeLabel={t.activeCheckin}
+      inactiveLabel={t.inactiveCheckin}
+      formatDistanceLabel={(distance) => formatText(t.stillAway, { distance: Math.round(distance) })}
       on:checkin={handleCheckIn}
     />
 
     {#if checkedInPoi}
       <p class="success">
-        Eingecheckt bei {checkedInPoi.name}
         {#if checkedInAt}
-          am {checkedInAt.toLocaleDateString()} um {checkedInAt.toLocaleTimeString()}
+          {formatText(t.checkedInAt, {
+            poi: checkedInPoi.name,
+            date: checkedInAt.toLocaleDateString($locale),
+            time: checkedInAt.toLocaleTimeString($locale)
+          })}
+        {:else}
+          {checkedInPoi.name}
         {/if}
       </p>
     {/if}
 
-    <h3>Check-in Historie</h3>
+    <h3>{t.history}</h3>
     {#if checkIns.length > 0}
       <ul class="history-list">
         {#each checkIns as checkIn}
           <li>
             <strong>{checkIn.poi.name}</strong><br />
-            {checkIn.timestamp.toLocaleDateString()} {checkIn.timestamp.toLocaleTimeString()}<br />
-            Distanz: {Math.round(checkIn.distance)}m
+            {checkIn.timestamp.toLocaleDateString($locale)} {checkIn.timestamp.toLocaleTimeString($locale)}<br />
+            {t.distance}: {Math.round(checkIn.distance)}m
           </li>
         {/each}
       </ul>
     {:else}
-      <p>Noch keine Meldungen erfasst.</p>
+      <p>{t.noHistory}</p>
     {/if}
   </section>
 
   <section class="panel panel-info">
-    <h2>Wertung und weitere Infos</h2>
+    <h2>{t.scoreInfo}</h2>
     <ul class="history-list">
-      <li>Jeder Check-in bringt Punkte auf Basis der Distanz zum POI (nah = mehr Punkte).</li>
-      <li>Die ewige Bestenliste summiert alle Punkte und Check-ins dauerhaft.</li>
-      <li>Bei Punktgleichheit entscheidet zuerst die Anzahl der Check-ins, dann der Name.</li>
-      <li>Die Auswertung findest du in der neuen Rubrik Bestenliste.</li>
+      {#each t.scoreNotes as note}
+        <li>{note}</li>
+      {/each}
     </ul>
-    <a class="jump-link" href="/bestenliste">Zur ewigen Bestenliste</a>
+    <a class="jump-link" href="/bestenliste">{t.gotoLeaderboard}</a>
   </section>
 </main>
 

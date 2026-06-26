@@ -1,15 +1,49 @@
 <script>
 	import favicon from '$lib/assets/favicon.svg';
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { initLocale, locale, setLocale } from '$lib/stores/i18n';
+
+	const copy = {
+		de: {
+			nav: {
+				home: 'Start',
+				checkin: 'Check-in',
+				members: 'Mitglieder',
+				leaderboard: 'Bestenliste',
+				route: 'Rennsteig'
+			},
+			brandSub: 'Rennsteig Sessions · Team-Tracking · Saisonpunkte',
+			languageLabel: 'Sprache',
+			navLabel: 'Hauptnavigation'
+		},
+		en: {
+			nav: {
+				home: 'Home',
+				checkin: 'Check-in',
+				members: 'Members',
+				leaderboard: 'Leaderboard',
+				route: 'Rennsteig'
+			},
+			brandSub: 'Rennsteig Sessions · Team Tracking · Season Points',
+			languageLabel: 'Language',
+			navLabel: 'Main navigation'
+		}
+	};
+
+	$: t = copy[$locale] ?? copy.de;
 
 	const navItems = [
-		{ href: '/', label: 'Start' },
-		{ href: '/checkin', label: 'Check-in' },
-		{ href: '/mitglieder', label: 'Mitglieder' },
-		{ href: '/bestenliste', label: 'Bestenliste' },
-		{ href: '/guide', label: 'Guide' },
-		{ href: '/rennsteig', label: 'Rennsteig' }
+		{ href: '/', key: 'home' },
+		{ href: '/checkin', key: 'checkin' },
+		{ href: '/mitglieder', key: 'members' },
+		{ href: '/bestenliste', key: 'leaderboard' },
+		{ href: '/rennsteig', key: 'route' }
 	];
+
+	onMount(() => {
+		initLocale();
+	});
 </script>
 
 <svelte:head>
@@ -22,13 +56,19 @@
 	<header class="topbar">
 		<div class="brand">
 			<p class="brand-name">AcrossR10 Expedition</p>
-			<p class="brand-sub">Rennsteig Sessions · Team Tracking · Saisonpunkte</p>
+			<p class="brand-sub">{t.brandSub}</p>
 		</div>
-		<nav aria-label="Hauptnavigation" class="main-nav">
+		<div class="nav-wrap">
+			<nav aria-label={t.navLabel} class="main-nav">
 			{#each navItems as item}
-				<a href={item.href} class:active={$page.url.pathname === item.href}>{item.label}</a>
+				<a href={item.href} class:active={$page.url.pathname === item.href}>{t.nav[item.key]}</a>
 			{/each}
-		</nav>
+			</nav>
+			<div class="lang-switch" aria-label={t.languageLabel}>
+				<button type="button" class:active={$locale === 'de'} on:click={() => setLocale('de')}>DE</button>
+				<button type="button" class:active={$locale === 'en'} on:click={() => setLocale('en')}>EN</button>
+			</div>
+		</div>
 	</header>
 
 	<div class="content-frame">
@@ -139,6 +179,11 @@
 		gap: 0.4rem;
 	}
 
+	.nav-wrap {
+		display: grid;
+		gap: 0.45rem;
+	}
+
 	.main-nav a {
 		color: #5f4730;
 		text-decoration: none;
@@ -164,6 +209,30 @@
 		box-shadow: 0 9px 16px rgba(95, 60, 28, 0.28);
 	}
 
+	.lang-switch {
+		display: flex;
+		gap: 0.35rem;
+		justify-content: flex-end;
+	}
+
+	.lang-switch button {
+		border: 1px solid rgba(122, 94, 60, 0.34);
+		border-radius: 999px;
+		background: rgba(255, 248, 237, 0.82);
+		color: #5f4730;
+		font: inherit;
+		font-size: 0.8rem;
+		font-weight: 700;
+		padding: 0.28rem 0.55rem;
+		cursor: pointer;
+	}
+
+	.lang-switch button.active {
+		background: linear-gradient(140deg, #a8753f, #82552d);
+		border-color: transparent;
+		color: #fff6ea;
+	}
+
 	.content-frame {
 		position: relative;
 		z-index: 2;
@@ -176,6 +245,10 @@
 
 		.brand-sub {
 			display: none;
+		}
+
+		.lang-switch {
+			justify-content: flex-start;
 		}
 	}
 </style>

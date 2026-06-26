@@ -1,206 +1,451 @@
 <script>
-  import MapPreview3D from '$lib/components/MapPreview3D.svelte';
-  import GpxTrackCard from '$lib/components/GpxTrackCard.svelte';
+  import { locale } from '$lib/stores/i18n';
 
-  const routeStats = [
-    { label: 'DISTANCE', value: 'ca. 58 km (Sample-Race)' },
-    { label: 'DAYS', value: '1' },
-    { label: '% UNPAVED', value: '62%' },
-    { label: '% SINGLETRACK', value: '18%' },
-    { label: '% RIDEABLE', value: '96%' },
-    { label: 'TOTAL ASCENT', value: 'ca. 1,250 m' },
-    { label: 'HIGH POINT', value: 'ca. 915 m' },
-    { label: 'DIFFICULTY', value: '5 / 10' }
-  ];
-
-  const routeScale = [
-    { label: 'CLIMBING SCALE', value: '18 m/km', detail: 'Steady climbs over long distances' },
-    { label: 'TECHNICAL', value: 'MODERATE', detail: 'Roots, loose gravel, wet forest lines' },
-    { label: 'PHYSICAL', value: 'MODERATE+', detail: 'Long days with repeated elevation gain' },
-    { label: 'LOGISTICS', value: 'EASY', detail: 'Villages and stations are regularly spaced' }
-  ];
-
-  const contributor = {
-    name: 'AcrossR10 Editorial Team',
-    role: 'Route Curation',
-    bio: 'Lokale Community-Rider und Tourenplaner, die den Rennsteig als Bikepacking-Linie fuhrbar, sicher und etappentauglich dokumentieren.'
+  const copy = {
+    de: {
+      metaLine: 'Standort Thüringen, Deutschland',
+      title: 'Rennsteig-Radwanderweg',
+      intro:
+        'Der Rennsteig-Radwanderweg ist ein rund 195 km langes Radangebot in der Region. Er führt von Hörschel bei Eisenach bis nach Blankenstein, verläuft teilweise direkt auf dem Rennsteig und weicht abschnittsweise auf parallele Routen aus.',
+      imageAlt: 'Rennsteig-Strecke im Wald',
+      metricAria: 'Routenmetriken',
+      routeStats: [
+        { label: 'LÄNGE', value: '195 km' },
+        { label: 'START / ZIEL', value: 'Hörschel bis Blankenstein' },
+        { label: 'WEGBELAG', value: 'Asphalt, Schotter, Waldweg' },
+        { label: 'MARKIERUNG', value: 'Grünes R mit Radfahrer' },
+        { label: 'ANREISE', value: 'DB nach Eisenach, Oberhof, Blankenstein' },
+        { label: 'PARKEN', value: 'Wanderparkplätze entlang der Route' },
+        { label: 'CHARAKTER', value: 'Teilweise anspruchsvoll' },
+        { label: 'RICHTUNG', value: 'In beide Richtungen fahrbar' }
+      ],
+      sectionCharacter: 'Streckencharakter',
+      characterText:
+        'Die Route verbindet landschaftliche Abschnitte des Thüringer Waldes mit interessanten Einblicken in Städte und Gemeinden entlang des Rennsteigs. Wer sich Zeit für Abstecher nimmt, findet unterwegs zusätzliche Sehenswürdigkeiten und touristische Angebote.',
+      routeScale: [
+        {
+          label: 'HÖHENPROFIL',
+          value: 'ANSPRUCHSVOLL IM WESTEN UND OSTEN',
+          detail: 'Die ersten rund 30 km bei Eisenach und die letzten rund 15 km vor Blankenstein sind deutlich steiler.'
+        },
+        {
+          label: 'ROUTENFÜHRUNG',
+          value: 'NAH AM RENNSTEIG',
+          detail: 'Der Radwanderweg verläuft teilweise direkt auf dem Rennsteig und weicht abschnittsweise auf parallele Routen aus.'
+        },
+        {
+          label: 'UNTERGRUND',
+          value: 'MIX',
+          detail: 'Abschnitte auf Waldwegen, Schotter und Straßen wechseln sich über die gesamte Strecke ab.'
+        },
+        {
+          label: 'KONDITION',
+          value: 'GUT',
+          detail: 'Für die teilweise bergigen bis stark ansteigenden Abschnitte ist solide Ausdauer sinnvoll.'
+        }
+      ],
+      sectionHighlights: 'Highlights',
+      highlights: [
+        '195 km durch den Thüringer Wald mit Landschaft, Aussichtspunkten und Ortsgeschichte entlang der Route.',
+        'Teilstrecken direkt auf dem Rennsteig, dazwischen parallele Führungen für den Radverkehr.',
+        'Abstecher zu Sehenswürdigkeiten in Städten und Gemeinden entlang der Hauptroute lohnen sich.',
+        'Die Route kann komplett oder abschnittsweise geplant und in beide Richtungen gefahren werden.'
+      ],
+      sectionMustKnow: 'Wichtig zu wissen',
+      mustKnow: [
+        'Die grün-schwarze Markierung mit dem R und Radfahrer weist den Streckenverlauf des Rennsteig-Radweges.',
+        'Die Strecke ist touristischer Radwanderweg, nicht durchgehend identisch mit dem Wander-Rennsteig.',
+        'Wegen wechselnder Untergründe und bergiger Passagen sind Tourenrad, Gravel oder MTB je nach Fahrstil sinnvoll.',
+        'Vor der Fahrt aktuelle Wetterlage, Wegezustand und mögliche Sperrungen prüfen.'
+      ],
+      sectionSegments: 'Abschnitte',
+      profileLabel: 'Profil',
+      tipLabel: 'Tipp',
+      stageNotes: [
+        {
+          title: 'Westabschnitt: Hörschel bis Inselsberg/Oberhof',
+          profile: 'Kräftiger Auftakt mit den größten Höhendifferenzen im Bereich Eisenach.',
+          hint: 'Für diesen Abschnitt Zeit, Reserven und wetterfeste Ausrüstung einplanen.'
+        },
+        {
+          title: 'Mittelteil: Oberhof bis Neuhaus am Rennweg',
+          profile: 'Längerer Mittelteil mit typischem Mix aus Waldwegen, Schotter und Straßen.',
+          hint: 'Etappenorte und Einkehrmöglichkeiten für Pausen oder Übernachtung nutzen.'
+        },
+        {
+          title: 'Ostteil: Neuhaus bis Blankenstein',
+          profile: 'Zum Schluss nochmals profilierter mit markanten Anstiegen und Abfahrten vor dem Ziel.',
+          hint: 'Die letzten Kilometer nicht unterschätzen und ausreichend Reserven behalten.'
+        }
+      ],
+      sectionOrientation: 'Orientierung & Planung',
+      orientationText:
+        'Die offizielle Beschilderung begleitet die Strecke, dennoch ist für die konkrete Etappenplanung eine digitale Karte sinnvoll. AcrossR10 zeigt die Route nur schematisch; die verbindlichen Tourist-Informationen stehen auf der offiziellen Rennsteig-Seite.',
+      officialLinksLabel: 'Offizielle Links',
+      officialLinkMain: 'Rennsteig.de / Radweg',
+      officialLinkMap: 'Karte zur Routenplanung',
+      officialLinkPlanner: 'Radroutenplaner Thüringen',
+      sectionPlanning: 'Planung',
+      planningNotes: [
+        {
+          title: 'Anreise',
+          text: 'Die offizielle Übersicht nennt Eisenach, Oberhof und Blankenstein als gut erreichbare Bahnstationen für Start, Teilabschnitt oder Rückreise.'
+        },
+        {
+          title: 'Etappenlogik',
+          text: 'Die 195 km lassen sich als Mehrtagestour oder in ausgewählten Teilsegmenten planen, je nach Kondition und Tagesziel.'
+        },
+        {
+          title: 'Beschilderung',
+          text: 'Die Route ist markiert, verläuft aber nicht immer direkt auf dem Rennsteig. Eine digitale Planungskarte bleibt deshalb sinnvoll.'
+        },
+        {
+          title: 'Fahrzeugwahl',
+          text: 'Wegen Asphalt-, Schotter- und Waldweganteilen eignen sich robuste Reiserad-, Trekking-, Gravel- oder MTB-Setups.'
+        }
+      ],
+      sectionAccommodations: 'Übernachtungsmöglichkeiten',
+      accommodations: [
+        {
+          area: 'Hotels',
+          text: 'Direkt über das Unterkunftsverzeichnis der Region am Rennsteig recherchierbar.'
+        },
+        {
+          area: 'Pensionen und Gasthöfe',
+          text: 'Sinnvoll für Etappenorte, wenn mehrere Tagesabschnitte geplant sind.'
+        },
+        {
+          area: 'Ferienwohnungen, Ferienhäuser und Camping',
+          text: 'Die offizielle Rennsteig-Seite verlinkt passende Kategorien für verschiedene Reiseformen.'
+        }
+      ],
+      sectionCamping: 'Camping / Unterkunft',
+      camping: [
+        'Unterkunft vorab entlang der gewünschten Etappenorte reservieren, besonders in der Hauptsaison.',
+        'Bei Radreise-Planung auf sicheren Fahrradabstellraum und Trocknungsmöglichkeiten achten.',
+        'Camping nur auf zulässigen Plätzen oder freigegebenen Flächen einplanen.'
+      ],
+      sectionResourcesPlan: 'Planungsressourcen',
+      typeLabel: 'Typ',
+      planningResources: [
+        {
+          name: 'Karte zur Routenplanung',
+          type: 'Offizielle Detailkarte',
+          hint: 'Direkter Link des Tourismusportals zur thematischen Routenplanung für den Rennsteig-Radweg.'
+        },
+        {
+          name: 'Radroutenplaner Thüringen',
+          type: 'Planungstool',
+          hint: 'Geeignet für Etappenplanung, Höhenprofil und Anschlussstrecken.'
+        },
+        {
+          name: 'Rennsteig.de / Radweg',
+          type: 'Offizielle Übersicht',
+          hint: 'Enthält Kurzübersicht, Charakter der Strecke und weiterführende Hinweise.'
+        }
+      ],
+      sectionFood: 'Verpflegung',
+      foodAndWater: [
+        'Versorgung in größeren Orten und touristischen Zentren aktiv einplanen.',
+        'Auf langen Waldpassagen ausreichend Wasser und Verpflegung mitnehmen.',
+        'Öffnungszeiten vor einer Mehrtagestour prüfen, besonders unter der Woche.'
+      ],
+      sectionMoreResources: 'Weitere Ressourcen',
+      resources: [
+        'Offizielle Rennsteig-Informationen zur Route und zu Unterkünften',
+        'Radroutenplaner Thüringen für Detailnavigation und Anschlussrouten',
+        'Aktuelle Wetter-, Anreise- und Sperrungsinfos vor dem Start'
+      ],
+      sectionFaq: 'FAQ',
+      faqItems: [
+        {
+          q: 'Wie lang ist der Rennsteig-Radwanderweg?',
+          a: 'Die offizielle Rennsteig-Seite beschreibt den Radwanderweg mit insgesamt 195 km.'
+        },
+        {
+          q: 'Wo beginnt und endet die Route?',
+          a: 'Die Hauptroute beginnt in Hörschel bei Eisenach und endet in Blankenstein. Sie kann auch in Gegenrichtung gefahren werden.'
+        },
+        {
+          q: 'Wie ist die Strecke markiert?',
+          a: 'Der Streckenverlauf ist mit einem grünen R und schwarzem Radfahrer markiert.'
+        },
+        {
+          q: 'Welchen Schwierigkeitsgrad hat die Route?',
+          a: 'Sie gilt als teilweise anspruchsvoll, besonders wegen der höhenintensiven Randabschnitte und des wechselnden Untergrunds.'
+        }
+      ],
+      sectionGallery: 'Impressionen',
+      gallery: [
+        { title: 'Waldkammlinien am Rennsteig', tone: 'tone-a' },
+        { title: 'Offene Abschnitte im Thüringer Wald', tone: 'tone-b' },
+        { title: 'Etappenorte und Rastpunkte', tone: 'tone-c' },
+        { title: 'Ankunft in Blankenstein', tone: 'tone-d' }
+      ],
+      terms:
+        'Hinweis: Diese Seite fasst touristische Basisdaten zusammen. Für aktuelle Bedingungen, Sperrungen und Detailnavigation bitte die offiziellen Quellen vor Fahrtbeginn prüfen.',
+      contributedBy: 'Beigetragen von',
+      contributor: {
+        name: 'AcrossR10 Editorial Team',
+        role: 'Routenredaktion',
+        bio: 'Zusammenfassung der touristischen Basisinformationen zum Rennsteig-Radwanderweg auf Grundlage der offiziellen Rennsteig-Quelle.'
+      },
+      sectionStartPoints: 'Startpunkte',
+      logisticsLabel: 'Logistik',
+      startPoints: [
+        {
+          name: 'Hörschel / Eisenach',
+          reason: 'Klassischer Startpunkt am westlichen Beginn des Rennsteigs.',
+          logistics: 'Anreise per DB bis Eisenach, danach kurzer Transfer nach Hörschel.'
+        },
+        {
+          name: 'Oberhof',
+          reason: 'Zentraler Einstieg für Teilabschnitte, Pausen oder Etappenplanung.',
+          logistics: 'Per Bahn erreichbar und mit guter touristischer Infrastruktur vor Ort.'
+        },
+        {
+          name: 'Blankenstein',
+          reason: 'Östlicher Endpunkt der Gesamtstrecke und sinnvoll für einen Start in Gegenrichtung.',
+          logistics: 'DB-Anschluss und Rückreiseoptionen für Zielankunft oder Gegenstart.'
+        }
+      ],
+      sectionQuickActions: 'Schnellzugriff',
+      actionOfficial: 'Offizielle Radweg-Seite',
+      actionPlanner: 'Radroutenplaner',
+      actionCheckin: 'AcrossR10 Check-in'
+    },
+    en: {
+      metaLine: 'Location Thuringia, Germany',
+      title: 'Rennsteig Cycle Route',
+      intro:
+        'The Rennsteig cycle route is a roughly 195 km route in the region. It runs from Hörschel near Eisenach to Blankenstein, partly directly on the Rennsteig ridge and partly on parallel routes.',
+      imageAlt: 'Rennsteig route in the forest',
+      metricAria: 'Route metrics',
+      routeStats: [
+        { label: 'DISTANCE', value: '195 km' },
+        { label: 'START / FINISH', value: 'Hörschel to Blankenstein' },
+        { label: 'SURFACE', value: 'Asphalt, gravel, forest trail' },
+        { label: 'SIGNAGE', value: 'Green R with cyclist symbol' },
+        { label: 'ARRIVAL', value: 'Rail to Eisenach, Oberhof, Blankenstein' },
+        { label: 'PARKING', value: 'Hiker parking spots along the route' },
+        { label: 'CHARACTER', value: 'Partly demanding' },
+        { label: 'DIRECTION', value: 'Rideable both directions' }
+      ],
+      sectionCharacter: 'Route character',
+      characterText:
+        'The route combines scenic sections of the Thuringian Forest with historical towns and villages along the Rennsteig. If you take detours, you will find additional sights and local highlights.',
+      routeScale: [
+        {
+          label: 'ELEVATION PROFILE',
+          value: 'DEMANDING IN WEST AND EAST',
+          detail: 'The first ~30 km near Eisenach and the final ~15 km before Blankenstein are steeper.'
+        },
+        {
+          label: 'ROUTE GUIDANCE',
+          value: 'CLOSE TO RENNSTEIG',
+          detail: 'The cycle route partly follows the Rennsteig directly and partly uses parallel paths.'
+        },
+        {
+          label: 'SURFACE MIX',
+          value: 'MIXED',
+          detail: 'Forest trails, gravel and paved roads alternate along the route.'
+        },
+        {
+          label: 'FITNESS',
+          value: 'GOOD',
+          detail: 'Solid endurance is recommended for hilly and steep sections.'
+        }
+      ],
+      sectionHighlights: 'Highlights',
+      highlights: [
+        '195 km through the Thuringian Forest with scenery, viewpoints and local history.',
+        'Some sections directly on the Rennsteig, others on suitable parallel bike routes.',
+        'Detours to sights in nearby towns and villages are worth planning in.',
+        'The route can be ridden in one go or in selected segments, in both directions.'
+      ],
+      sectionMustKnow: 'Must know',
+      mustKnow: [
+        'The green-black route sign with an R and cyclist marks the cycle route.',
+        'This is a dedicated cycle touring route and not always identical to the hiking Rennsteig.',
+        'Due to mixed surfaces and hilly sections, trekking, gravel or MTB setups are recommended.',
+        'Check weather, surface conditions and possible closures before riding.'
+      ],
+      sectionSegments: 'Sections',
+      profileLabel: 'Profile',
+      tipLabel: 'Tip',
+      stageNotes: [
+        {
+          title: 'West section: Hörschel to Inselsberg/Oberhof',
+          profile: 'Strong opening with the largest elevation differences near Eisenach.',
+          hint: 'Plan enough time, reserves and weatherproof gear for this segment.'
+        },
+        {
+          title: 'Middle section: Oberhof to Neuhaus am Rennweg',
+          profile: 'Long central part with a typical mix of forest paths, gravel and roads.',
+          hint: 'Use stage towns for breaks, food stops and overnight stays.'
+        },
+        {
+          title: 'East section: Neuhaus to Blankenstein',
+          profile: 'More profile again toward the end with notable climbs and descents.',
+          hint: 'Do not underestimate the final kilometers and keep reserves.'
+        }
+      ],
+      sectionOrientation: 'Orientation & planning',
+      orientationText:
+        'The official signage supports navigation, but digital map planning remains useful for detailed stages. AcrossR10 shows a schematic overview; authoritative information is on the official Rennsteig website.',
+      officialLinksLabel: 'Official links',
+      officialLinkMain: 'Rennsteig.de / Cycle route',
+      officialLinkMap: 'Route planning map',
+      officialLinkPlanner: 'Thuringia bike route planner',
+      sectionPlanning: 'Planning',
+      planningNotes: [
+        {
+          title: 'Arrival',
+          text: 'The official overview names Eisenach, Oberhof and Blankenstein as useful rail access points for start, partial stages and return travel.'
+        },
+        {
+          title: 'Stage logic',
+          text: 'The 195 km can be planned as a multi-day tour or in selected sections depending on fitness and daily goals.'
+        },
+        {
+          title: 'Signage',
+          text: 'The route is marked but does not always run directly on the Rennsteig trail; a planning map is recommended.'
+        },
+        {
+          title: 'Bike choice',
+          text: 'Because of asphalt, gravel and forest-track sections, robust touring, trekking, gravel or MTB setups are suitable.'
+        }
+      ],
+      sectionAccommodations: 'Accommodation options',
+      accommodations: [
+        {
+          area: 'Hotels',
+          text: 'Available through the region’s official accommodation directory.'
+        },
+        {
+          area: 'Guesthouses and inns',
+          text: 'Useful in stage towns when planning multiple riding days.'
+        },
+        {
+          area: 'Apartments, holiday homes and camping',
+          text: 'The official Rennsteig page links suitable categories for different travel styles.'
+        }
+      ],
+      sectionCamping: 'Camping / lodging',
+      camping: [
+        'Reserve accommodation along your planned stage towns, especially in peak season.',
+        'For bike trips, look for secure bike storage and drying options.',
+        'Plan camping only on approved campsites or officially allowed areas.'
+      ],
+      sectionResourcesPlan: 'Planning resources',
+      typeLabel: 'Type',
+      planningResources: [
+        {
+          name: 'Route planning map',
+          type: 'Official detailed map',
+          hint: 'Direct tourism-portal link for thematic planning of the Rennsteig cycle route.'
+        },
+        {
+          name: 'Thuringia bike route planner',
+          type: 'Planning tool',
+          hint: 'Useful for stage planning, elevation profiles and connecting routes.'
+        },
+        {
+          name: 'Rennsteig.de / Cycle route',
+          type: 'Official overview',
+          hint: 'Contains key facts, route character and further information.'
+        }
+      ],
+      sectionFood: 'Food & water',
+      foodAndWater: [
+        'Actively plan resupply in larger towns and tourist centers.',
+        'Carry sufficient water and food on longer forest sections.',
+        'Check opening hours before multi-day rides, especially on weekdays.'
+      ],
+      sectionMoreResources: 'Additional resources',
+      resources: [
+        'Official Rennsteig information for route and accommodation',
+        'Thuringia bike route planner for detailed navigation and connectors',
+        'Current weather, travel and closure information before start'
+      ],
+      sectionFaq: 'FAQ',
+      faqItems: [
+        {
+          q: 'How long is the Rennsteig cycle route?',
+          a: 'The official Rennsteig page states a total route length of 195 km.'
+        },
+        {
+          q: 'Where does the route start and end?',
+          a: 'The main route starts in Hörschel near Eisenach and ends in Blankenstein. It can also be ridden in reverse.'
+        },
+        {
+          q: 'How is the route marked?',
+          a: 'A green R with a black cyclist symbol marks the route guidance.'
+        },
+        {
+          q: 'How difficult is the route?',
+          a: 'It is partly demanding, especially due to elevation-heavy edge sections and mixed surfaces.'
+        }
+      ],
+      sectionGallery: 'Impressions',
+      gallery: [
+        { title: 'Forest ridge lines on Rennsteig', tone: 'tone-a' },
+        { title: 'Open sections in Thuringian Forest', tone: 'tone-b' },
+        { title: 'Stage towns and break points', tone: 'tone-c' },
+        { title: 'Arrival in Blankenstein', tone: 'tone-d' }
+      ],
+      terms:
+        'Note: This page summarizes core tourist information. For current conditions, closures and detailed navigation, please check official sources before riding.',
+      contributedBy: 'Contributed by',
+      contributor: {
+        name: 'AcrossR10 Editorial Team',
+        role: 'Route editorial',
+        bio: 'Summary of the official Rennsteig cycle-route baseline information for orientation and planning.'
+      },
+      sectionStartPoints: 'Start points',
+      logisticsLabel: 'Logistics',
+      startPoints: [
+        {
+          name: 'Hörschel / Eisenach',
+          reason: 'Classic start at the western beginning of Rennsteig.',
+          logistics: 'Rail to Eisenach, then short transfer to Hörschel.'
+        },
+        {
+          name: 'Oberhof',
+          reason: 'Central access point for partial stages, breaks or tour planning.',
+          logistics: 'Reachable by rail with good local tourism infrastructure.'
+        },
+        {
+          name: 'Blankenstein',
+          reason: 'Eastern endpoint and useful for starting in reverse direction.',
+          logistics: 'Rail connection with return-travel options.'
+        }
+      ],
+      sectionQuickActions: 'Quick actions',
+      actionOfficial: 'Official route page',
+      actionPlanner: 'Route planner',
+      actionCheckin: 'AcrossR10 check-in'
+    }
   };
 
-  const startPoints = [
-    {
-      name: 'Hörschel (bei Eisenach)',
-      reason: 'Traditioneller Einstieg mit Symbolstart am Rennsteigbeginn.',
-      logistics: 'Bahnhof Eisenach + kurzer Zubringer'
-    },
-    {
-      name: 'Oberhof',
-      reason: 'Zentraler Einstieg mit vielen Unterkünften und Bike-freundlicher Infrastruktur.',
-      logistics: 'Sehr gute Erreichbarkeit via A71'
-    },
-    {
-      name: 'Neuhaus am Rennweg',
-      reason: 'Starker Hub für Mittelabschnitte mit flexiblen Rundtour-Optionen.',
-      logistics: 'Mehrere Einstiegspunkte + Parken im Ort'
-    }
-  ];
+  $: t = copy[$locale] ?? copy.de;
 
-  const highlights = [
-    'Eintägiges Rennformat mit frei wählbarer Startzeit innerhalb des Eventfensters',
-    'Teilnahme solo oder in selbst organisierter Kleingruppe möglich',
-    'Markante Punkte wie Burg Elgersburg, Mönchhof und Aussichtspassagen',
-    'Technisch moderat mit hoher Fahrfrequenz auf wechselnden Walduntergründen'
-  ];
-
-  const mustKnow = [
-    'Die Veranstaltung ist als One-Day-Race geplant: kein offizieller Massenstart.',
-    'Jede Person oder Gruppe fährt in Eigenverantwortung mit eigener Navigation.',
-    'Tracknachweis über GPX-Aufzeichnung (z. B. Bikecomputer/Komoot/Garmin).',
-    'Offline-Karte + GPX sind auf Teilstücken ohne stabiles Netz Pflicht.'
-  ];
-
-  const stageNotes = [
-    {
-      title: 'Westabschnitt: Hörschel → Oberhof',
-      profile: 'Langer Anstieg, stetiger Höhengewinn, fordernde Forstwege.',
-      hint: 'Früh starten und Verpflegung für längere Distanz mitnehmen.'
-    },
-    {
-      title: 'Mittelteil: Oberhof -> Neuhaus',
-      profile: 'Abwechslungsreiche Kammwege, offene Landschaft und Waldwechsel.',
-      hint: 'Bei Nebel Navigation auf Trackbasis nutzen.'
-    },
-    {
-      title: 'Ostteil: Neuhaus -> Blankenstein',
-      profile: 'Flüssigeres Terrain mit schnellen Abschnitten und Ortsdurchfahrten.',
-      hint: 'Auf touristischen Teilstücken frühzeitig Geschwindigkeit anpassen.'
-    }
-  ];
-
-  const raceOrga = [
-    {
-      title: 'Startfenster',
-      text: 'Empfohlenes Startfenster 06:00-10:00 Uhr, damit alle vor Einbruch der Dunkelheit im Ziel sind.'
-    },
-    {
-      title: 'Teilnahmeformat',
-      text: 'Solo oder als selbst organisierte Gruppe (2-8 Personen) mit gemeinsamer Sicherheitsabsprache.'
-    },
-    {
-      title: 'Wertungsidee',
-      text: 'Finisher-Event: Ziel ist die komplette Strecke in einem Tag. Optional Ranking nach Nettofahrzeit.'
-    },
-    {
-      title: 'Sicherheit',
-      text: 'Helm, Licht, Erste-Hilfe-Basics, Mobilakku und Notfallkontakt sind verpflichtend empfohlen.'
-    }
-  ];
-
-  const faqItems = [
-    {
-      q: 'Kann ich auch allein starten?',
-      a: 'Ja. Das Event ist explizit für Solo-Starts und Gruppenstarts ohne zentrale Formation ausgelegt.'
-    },
-    {
-      q: 'Darf ich in einer spontanen Gruppe fahren?',
-      a: 'Ja. Gruppen können sich selbst organisieren. Tempo, Pausen und Navigation werden eigenständig abgestimmt.'
-    },
-    {
-      q: 'Wie wird die absolvierte Strecke nachgewiesen?',
-      a: 'Über eine durchgehende GPX-Aufzeichnung plus Zieleintrag im Event-Check-in.'
-    },
-    {
-      q: 'Gibt es eine Abbruchstrategie?',
-      a: 'Ja. Mehrere Orte entlang der Strecke haben Taxi-/Bahn-/Busoptionen für einen sicheren Rückweg.'
-    }
-  ];
-
-  const aidStations = [
-    {
-      name: 'Gasthaus Mönchhof',
-      type: 'Einkehr / Wasser / warme Speisen',
-      hint: 'Sinnvoller Mid-Race-Stopp im westlichen Mittelteil.'
-    },
-    {
-      name: 'Schmiedefeld am Rennsteig',
-      type: 'Bäcker / Markt / Gastronomie',
-      hint: 'Sehr guter Vor- und Nachversorgungs-Hub mit kurzer Distanz zu Unterkünften.'
-    },
-    {
-      name: 'Elgersburg (Ortsbereich)',
-      type: 'Nahversorgung / Brunnen / Gastro',
-      hint: 'Flexible Nachfülloption kurz vor den längeren Waldpassagen.'
-    }
-  ];
-
-  const accommodations = [
-    {
-      area: 'Schmiedefeld am Rennsteig',
-      text: 'Ideal als Race-Base für Anreise am Vortag und Regeneration nach dem Zieleinlauf.'
-    },
-    {
-      area: 'Oberhof',
-      text: 'Gute Auswahl an Hotels/Pensionen, geeignet für Teams oder Begleitpersonen.'
-    },
-    {
-      area: 'Neuhaus am Rennweg',
-      text: 'Ruhigere Alternative mit guter Erreichbarkeit für Pre-/Post-Race-Übernachtung.'
-    }
-  ];
-
-  const camping = [
-    'Basislager in Oberhof oder Neuhaus für sternförmige Tagesloops.',
-    'Vorab prüfen, welche Unterkünfte sicheren Bike-Abstellraum anbieten.',
-    'Bei Biwak-Planung nur freigegebene Flächen und lokale Regeln beachten.'
-  ];
-
-  const foodAndWater = [
-    'Regelmäßig nachfüllen in Ortschaften einplanen, nicht auf einzelne Quellen verlassen.',
-    'Wochenenden bieten bessere Einkehrdichte als ruhige Wochentage.',
-    'Energiereserve für 2-3 Stunden extra Fahrzeit mitführen.'
-  ];
-
-  const resources = [
-    'Rennsteig-Shuttle und regionale Fahrpläne für Rücktransfers',
-    'Lokale Wetter- und Wegesperrungsinfos aus den Tourismusorten',
-    'Saisonhinweise zu Waldarbeiten und Forstsperrungen'
-  ];
-
-  const gallery = [
-    { title: 'Morgenlicht am Kamm', tone: 'tone-a' },
-    { title: 'Forstpassage Richtung Oberhof', tone: 'tone-b' },
-    { title: 'Schneller Ostteil bei Neuhaus', tone: 'tone-c' },
-    { title: 'Abendstimmung vor Blankenstein', tone: 'tone-d' }
-  ];
-
-  const rennsteigPreviewPoints = [
-    { x: 0, y: 0, elevation: 300, label: 'Hörschel' },
-    { x: 18, y: 6, elevation: 520, label: 'Ruhla' },
-    { x: 34, y: 10, elevation: 780, label: 'Inselsberg-Region' },
-    { x: 48, y: 18, elevation: 840, label: 'Oberhof' },
-    { x: 66, y: 23, elevation: 720, label: 'Schmiedefeld' },
-    { x: 82, y: 29, elevation: 760, label: 'Neuhaus' },
-    { x: 100, y: 36, elevation: 500, label: 'Blankenstein' }
-  ];
 </script>
 
 <main>
   <header class="hero">
-    <p class="meta-line">LOCATION THURINGIA, GERMANY</p>
-    <h1>Rennsteig One-Day Race</h1>
-    <p class="dek">
-      Das Event ist als eintägiges Rennen gestaltet und kann individuell solo oder in selbst
-      organisierten Gruppen gefahren werden. Der bereitgestellte GPX-Track bildet die verbindliche
-      Rennlinie für Navigation und Nachweis.
-    </p>
+    <p class="meta-line">{t.metaLine}</p>
+    <h1>{t.title}</h1>
+    <p class="dek">{t.intro}</p>
     <figure class="hero-art">
       <img
         src="/42BD92FD-A239-43C8-809F-06FAD4024551_1_105_c.jpeg"
-        alt="Rennsteig Strecke im Wald"
+        alt={t.imageAlt}
         loading="eager"
       />
     </figure>
-    <div class="route-stats" aria-label="Routenmetriken">
-      {#each routeStats as metric}
+    <div class="route-stats" aria-label={t.metricAria}>
+      {#each t.routeStats as metric}
         <article>
           <p class="label">{metric.label}</p>
           <p class="value">{metric.value}</p>
@@ -211,15 +456,11 @@
 
   <section class="article-grid">
     <article class="narrative">
-      <h2>Route Difficulty</h2>
-      <p>
-        Das One-Day-Race ist fahrtechnisch moderat, konditionell jedoch anspruchsvoll durch Dauer,
-        Höhenmeter und wechselnde Bodenverhältnisse. Gute Pacing-Strategie und verlässliche
-        Eigenverpflegung machen den Unterschied im letzten Renndrittel.
-      </p>
+      <h2>{t.sectionCharacter}</h2>
+      <p>{t.characterText}</p>
 
       <div class="scale-grid">
-        {#each routeScale as scale}
+        {#each t.routeScale as scale}
           <article class="scale-card">
             <p class="scale-label">{scale.label}</p>
             <p class="scale-value">{scale.value}</p>
@@ -228,47 +469,57 @@
         {/each}
       </div>
 
-      <h2>Highlights</h2>
+      <h2>{t.sectionHighlights}</h2>
       <ul class="text-list">
-        {#each highlights as item}
+        {#each t.highlights as item}
           <li>{item}</li>
         {/each}
       </ul>
 
-      <h2>Must Know</h2>
+      <h2>{t.sectionMustKnow}</h2>
       <ul class="text-list">
-        {#each mustKnow as note}
+        {#each t.mustKnow as note}
           <li>{note}</li>
         {/each}
       </ul>
 
-      <h2>Trail Notes</h2>
+      <h2>{t.sectionSegments}</h2>
       <div class="stage-list">
-        {#each stageNotes as stage}
+        {#each t.stageNotes as stage}
           <article>
             <h3>{stage.title}</h3>
-            <p><strong>Profil:</strong> {stage.profile}</p>
-            <p><strong>Tipp:</strong> {stage.hint}</p>
+            <p><strong>{t.profileLabel}:</strong> {stage.profile}</p>
+            <p><strong>{t.tipLabel}:</strong> {stage.hint}</p>
           </article>
         {/each}
       </div>
 
-      <h2>Map & GPS</h2>
-      <GpxTrackCard
-        gpxPath="/rennsteig-race.gpx"
-        title="GPX Beispieltrack: Burg Elgersburg - Gasthaus Mönchhof Runde"
-      />
-
-      <MapPreview3D title="3D Map Vorschau der Strecke" points={rennsteigPreviewPoints} />
+      <h2>{t.sectionOrientation}</h2>
+      <p>{t.orientationText}</p>
 
       <p>
-        Download des Original-GPX:
-        <a class="inline-link" href="/rennsteig-race.gpx" download>rennsteig-race.gpx</a>
+        {t.officialLinksLabel}:
+        <a class="inline-link" href="https://www.rennsteig.de/radweg" target="_blank" rel="noreferrer"
+          >{t.officialLinkMain}</a
+        >,
+        <a
+          class="inline-link"
+          href="https://radservice.radroutenplaner.thueringen.de/rrp/th/cgi?view=584075,5585369,692965,5652338&showThematicRoute=Rennsteig-Radweg"
+          target="_blank"
+          rel="noreferrer">{t.officialLinkMap}</a
+        >
+        und
+        <a
+          class="inline-link"
+          href="https://www.radroutenplaner.thueringen.de/"
+          target="_blank"
+          rel="noreferrer">{t.officialLinkPlanner}</a
+        >.
       </p>
 
-      <h2>Organisation</h2>
+      <h2>{t.sectionPlanning}</h2>
       <div class="faq-list">
-        {#each raceOrga as item}
+        {#each t.planningNotes as item}
           <article class="faq-item">
             <h3>{item.title}</h3>
             <p>{item.text}</p>
@@ -278,9 +529,9 @@
 
       <div class="split-list">
         <section>
-          <h3>Übernachtungsmöglichkeiten</h3>
+          <h3>{t.sectionAccommodations}</h3>
           <div class="faq-list">
-            {#each accommodations as place}
+            {#each t.accommodations as place}
               <article class="faq-item">
                 <h4>{place.area}</h4>
                 <p>{place.text}</p>
@@ -288,45 +539,45 @@
             {/each}
           </div>
 
-          <h3>Camping / Unterkunft</h3>
+          <h3>{t.sectionCamping}</h3>
           <ul class="text-list compact">
-            {#each camping as item}
+            {#each t.camping as item}
               <li>{item}</li>
             {/each}
           </ul>
         </section>
 
         <section>
-          <h3>Verpflegungsstationen</h3>
+          <h3>{t.sectionResourcesPlan}</h3>
           <div class="faq-list">
-            {#each aidStations as station}
+            {#each t.planningResources as station}
               <article class="faq-item">
                 <h4>{station.name}</h4>
-                <p><strong>Typ:</strong> {station.type}</p>
+                <p><strong>{t.typeLabel}:</strong> {station.type}</p>
                 <p>{station.hint}</p>
               </article>
             {/each}
           </div>
 
-          <h3>Food / H2O</h3>
+          <h3>{t.sectionFood}</h3>
           <ul class="text-list compact">
-            {#each foodAndWater as item}
+            {#each t.foodAndWater as item}
               <li>{item}</li>
             {/each}
           </ul>
         </section>
       </div>
 
-      <h3>Resources</h3>
+      <h3>{t.sectionMoreResources}</h3>
       <ul class="text-list compact">
-        {#each resources as item}
+        {#each t.resources as item}
           <li>{item}</li>
         {/each}
       </ul>
 
-      <h2>FAQ</h2>
+      <h2>{t.sectionFaq}</h2>
       <div class="faq-list">
-        {#each faqItems as item}
+        {#each t.faqItems as item}
           <article class="faq-item">
             <h3>{item.q}</h3>
             <p>{item.a}</p>
@@ -334,45 +585,42 @@
         {/each}
       </div>
 
-      <h2>Photo Gallery</h2>
+      <h2>{t.sectionGallery}</h2>
       <div class="gallery-grid">
-        {#each gallery as frame}
+        {#each t.gallery as frame}
           <figure class={`gallery-frame ${frame.tone}`}>
             <figcaption>{frame.title}</figcaption>
           </figure>
         {/each}
       </div>
 
-      <p class="terms">
-        Terms of use: Die Route ist eine Planungsgrundlage. Vor der Fahrt aktuelle Bedingungen,
-        Sperrungen und Wetterlage prüfen und die Strecke auf eigenes Risiko befahren.
-      </p>
+      <p class="terms">{t.terms}</p>
     </article>
 
     <aside class="sidebar">
       <section class="contributor-card">
-        <p class="card-kicker">CONTRIBUTED BY</p>
-        <h3>{contributor.name}</h3>
-        <p class="role">{contributor.role}</p>
-        <p>{contributor.bio}</p>
+        <p class="card-kicker">{t.contributedBy}</p>
+        <h3>{t.contributor.name}</h3>
+        <p class="role">{t.contributor.role}</p>
+        <p>{t.contributor.bio}</p>
       </section>
 
       <section class="quick-card">
-        <h3>Startpunkte</h3>
-        {#each startPoints as option}
+        <h3>{t.sectionStartPoints}</h3>
+        {#each t.startPoints as option}
           <article class="quick-item">
             <h4>{option.name}</h4>
             <p>{option.reason}</p>
-            <p><strong>Logistik:</strong> {option.logistics}</p>
+            <p><strong>{t.logisticsLabel}:</strong> {option.logistics}</p>
           </article>
         {/each}
       </section>
 
       <section class="quick-card">
-        <h3>Quick Actions</h3>
-        <a class="ghost-btn" href="/checkin">Check-in starten</a>
-        <a class="ghost-btn" href="/mitglieder">Mitglieder LiveTracking</a>
-        <a class="ghost-btn" href="/guide">Route Guide</a>
+        <h3>{t.sectionQuickActions}</h3>
+        <a class="ghost-btn" href="https://www.rennsteig.de/radweg">{t.actionOfficial}</a>
+        <a class="ghost-btn" href="https://www.radroutenplaner.thueringen.de/">{t.actionPlanner}</a>
+        <a class="ghost-btn" href="/checkin">{t.actionCheckin}</a>
       </section>
     </aside>
   </section>
