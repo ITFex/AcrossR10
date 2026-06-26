@@ -1,4 +1,5 @@
 <script>
+  import LeafletRennsteigMap from '$lib/components/LeafletRennsteigMap.svelte';
   import { locale } from '$lib/stores/i18n';
 
   const copy = {
@@ -81,6 +82,9 @@
       sectionOrientation: 'Orientierung & Planung',
       orientationText:
         'Die offizielle Beschilderung begleitet die Strecke, dennoch ist für die konkrete Etappenplanung eine digitale Karte sinnvoll. AcrossR10 zeigt die Route nur schematisch; die verbindlichen Tourist-Informationen stehen auf der offiziellen Rennsteig-Seite.',
+      sectionLeafletMap: 'Rennsteig Karte',
+      sectionLeafletMapText:
+        'Interaktive Leaflet-Karte mit der hinterlegten Radtour (GPX), inklusive Start-/Zielmarkierung und Wegpunkten.',
       officialLinksLabel: 'Offizielle Links',
       officialLinkMain: 'Rennsteig.de / Radweg',
       officialLinkMap: 'Karte zur Routenplanung',
@@ -293,6 +297,9 @@
       sectionOrientation: 'Orientation & planning',
       orientationText:
         'The official signage supports navigation, but digital map planning remains useful for detailed stages. AcrossR10 shows a schematic overview; authoritative information is on the official Rennsteig website.',
+      sectionLeafletMap: 'Rennsteig map',
+      sectionLeafletMapText:
+        'Interactive Leaflet map with the included bike tour GPX, including start/finish markers and waypoints.',
       officialLinksLabel: 'Official links',
       officialLinkMain: 'Rennsteig.de / Cycle route',
       officialLinkMap: 'Route planning map',
@@ -496,6 +503,12 @@
 
       <h2>{t.sectionOrientation}</h2>
       <p>{t.orientationText}</p>
+
+      <LeafletRennsteigMap
+        title={t.sectionLeafletMap}
+        description={t.sectionLeafletMapText}
+        gpxPath="/rennsteig-race.gpx"
+      />
 
       <p>
         {t.officialLinksLabel}:
