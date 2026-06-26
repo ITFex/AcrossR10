@@ -102,20 +102,20 @@
   .panel {
     border-radius: 0.9rem;
     padding: 1rem;
-    border: 1px solid #35506c;
-    background: linear-gradient(160deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+    border: 1px solid #d0b390;
+    background: linear-gradient(160deg, rgba(248, 238, 224, 0.98), rgba(240, 224, 203, 0.98));
     display: grid;
     gap: 0.6rem;
   }
 
   .hero-panel {
-    border-color: #8b6a2d;
-    background: linear-gradient(160deg, rgba(64, 42, 15, 0.82), rgba(15, 23, 42, 0.95));
+    border-color: #bd935f;
+    background: linear-gradient(160deg, rgba(234, 216, 190, 0.98), rgba(244, 232, 214, 0.98));
   }
 
   .kicker {
     margin: 0;
-    color: #fde68a;
+    color: #9c7444;
     text-transform: uppercase;
     font-size: 0.75rem;
     font-weight: 700;
@@ -136,10 +136,10 @@
   }
 
   .metrics span {
-    border: 1px solid #8b6a2d;
+    border: 1px solid #c8a97e;
     border-radius: 999px;
     padding: 0.3rem 0.65rem;
-    background: rgba(15, 23, 42, 0.55);
+    background: rgba(247, 237, 222, 0.92);
     font-size: 0.84rem;
   }
 
@@ -150,8 +150,8 @@
 
   .podium-card {
     border-radius: 0.75rem;
-    border: 1px solid #4f6f8b;
-    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid #d1b48f;
+    background: rgba(251, 244, 234, 0.95);
     padding: 0.75rem;
     display: grid;
     gap: 0.25rem;
@@ -160,7 +160,7 @@
   .rank {
     font-size: 0.9rem;
     font-weight: 700;
-    color: #fcd34d;
+    color: #9c7444;
   }
 
   .table-wrap {
@@ -177,12 +177,12 @@
   td {
     text-align: left;
     padding: 0.55rem 0.5rem;
-    border-bottom: 1px solid #35506c;
+    border-bottom: 1px solid #ddc6a7;
     font-size: 0.9rem;
   }
 
   th {
-    color: #c7d2fe;
+    color: #7c6243;
     font-weight: 700;
   }
 

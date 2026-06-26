@@ -76,12 +76,12 @@
   :global(body) {
     margin: 0;
     font-family: 'Space Grotesk', 'Avenir Next', system-ui, sans-serif;
-    color: #f8fafc;
+    color: #4f3a25;
     background:
-      radial-gradient(circle at 15% 0%, rgba(34, 197, 94, 0.24), transparent 30%),
-      radial-gradient(circle at 85% 10%, rgba(14, 165, 233, 0.22), transparent 36%),
-      radial-gradient(circle at 40% 100%, rgba(251, 191, 36, 0.14), transparent 30%),
-      #0f172a;
+      radial-gradient(circle at 15% 0%, rgba(205, 170, 130, 0.24), transparent 32%),
+      radial-gradient(circle at 85% 10%, rgba(185, 149, 108, 0.22), transparent 38%),
+      radial-gradient(circle at 40% 100%, rgba(221, 194, 162, 0.28), transparent 34%),
+      #f3e7d5;
   }
 
   main {
@@ -93,20 +93,20 @@
   }
 
   .panel {
-    background: linear-gradient(160deg, rgba(21, 33, 51, 0.96), rgba(8, 15, 28, 0.96));
-    border: 1px solid #345a7e;
+    background: linear-gradient(160deg, rgba(248, 238, 224, 0.98), rgba(239, 223, 203, 0.98));
+    border: 1px solid #d2b691;
     border-radius: 1rem;
     padding: 1rem;
-    box-shadow: 0 12px 30px rgba(2, 8, 23, 0.34);
+    box-shadow: 0 12px 30px rgba(125, 96, 66, 0.16);
   }
 
   .hero {
     display: grid;
     gap: 1rem;
-    border-color: #2b7aa6;
+    border-color: #c39a66;
     background:
-      linear-gradient(140deg, rgba(6, 78, 114, 0.5), rgba(15, 23, 42, 0.92)),
-      radial-gradient(circle at 90% 10%, rgba(34, 197, 94, 0.24), transparent 45%);
+      linear-gradient(140deg, rgba(233, 215, 189, 0.95), rgba(245, 236, 223, 0.98)),
+      radial-gradient(circle at 90% 10%, rgba(183, 140, 94, 0.22), transparent 45%);
     animation: reveal 420ms ease-out;
   }
 
@@ -131,14 +131,14 @@
   }
 
   .btn-primary {
-    color: #f8fafc;
-    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    color: #fff9ef;
+    background: linear-gradient(135deg, #b8824a, #9f6f3d);
   }
 
   .btn-secondary {
-    color: #e2e8f0;
-    background: rgba(15, 23, 42, 0.56);
-    border: 1px solid #4b6f92;
+    color: #6a5033;
+    background: rgba(246, 236, 220, 0.88);
+    border: 1px solid #c8aa83;
   }
 
   .hero-stats {
@@ -148,9 +148,9 @@
   }
 
   .hero-stats article {
-    border: 1px solid #3e6b90;
+    border: 1px solid #d2b38d;
     border-radius: 0.75rem;
-    background: rgba(15, 23, 42, 0.52);
+    background: rgba(250, 242, 231, 0.94);
     padding: 0.55rem;
   }
 
@@ -162,17 +162,17 @@
   .stat-value {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #e0f2fe;
+    color: #5f452a;
   }
 
   .stat-label {
     font-size: 0.78rem;
-    color: #c7d2fe;
+    color: #8b6a48;
   }
 
   .kicker {
     margin: 0;
-    color: #67e8f9;
+    color: #9c7444;
     text-transform: uppercase;
     font-size: 0.75rem;
     font-weight: 700;
@@ -203,7 +203,7 @@
 
   .mini-kicker {
     margin: 0;
-    color: #93c5fd;
+    color: #8d6a42;
     font-size: 0.74rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -214,8 +214,8 @@
   .card a {
     width: fit-content;
     text-decoration: none;
-    color: #f8fafc;
-    background: linear-gradient(135deg, #0284c7, #1d4ed8);
+    color: #fff9ef;
+    background: linear-gradient(135deg, #b8824a, #9f6f3d);
     border-radius: 999px;
     padding: 0.5rem 0.8rem;
     font-size: 0.9rem;
@@ -233,8 +233,8 @@
   }
 
   .card-highlight {
-    border-color: #956f2d;
-    background: linear-gradient(160deg, rgba(72, 49, 16, 0.84), rgba(12, 20, 38, 0.95));
+    border-color: #b58a58;
+    background: linear-gradient(160deg, rgba(232, 213, 185, 0.98), rgba(243, 229, 208, 0.98));
   }
 
   .card ul {

@@ -217,8 +217,8 @@
   }
 
   .panel {
-    background: linear-gradient(160deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-    border: 1px solid #34516f;
+    background: linear-gradient(160deg, rgba(248, 238, 224, 0.98), rgba(240, 224, 203, 0.98));
+    border: 1px solid #d1b48f;
     border-radius: 0.9rem;
     padding: 1rem;
     display: grid;
@@ -226,7 +226,7 @@
   }
 
   .panel-hero {
-    border-color: #2f6f92;
+    border-color: #c39b67;
   }
 
   .hero-meta {
@@ -238,14 +238,14 @@
   .hero-meta span {
     display: inline-flex;
     border-radius: 999px;
-    border: 1px solid #3f6585;
-    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid #cfb18a;
+    background: rgba(247, 237, 222, 0.9);
     padding: 0.25rem 0.6rem;
     font-size: 0.82rem;
   }
 
   .panel-identity {
-    border-color: #3f8b79;
+    border-color: #ba9768;
   }
 
   h1,
@@ -255,7 +255,7 @@
   }
 
   .error {
-    color: #fca5a5;
+    color: #b24d3b;
     font-weight: 700;
   }
 
@@ -265,31 +265,31 @@
   }
 
   input {
-    border: 1px solid #4e6f8f;
+    border: 1px solid #c9aa82;
     border-radius: 0.65rem;
-    background: rgba(15, 23, 42, 0.7);
-    color: #f8fafc;
+    background: rgba(251, 245, 236, 0.92);
+    color: #4f3a25;
     padding: 0.6rem 0.65rem;
     font: inherit;
   }
 
   .subtle {
-    color: #cbd5e1;
+    color: #7d6141;
     font-size: 0.86rem;
   }
 
   .success {
-    color: #86efac;
+    color: #497046;
     font-weight: 700;
   }
 
   .inside {
-    color: #86efac;
+    color: #497046;
     font-weight: 700;
   }
 
   .outside {
-    color: #fdba74;
+    color: #a46334;
     font-weight: 700;
   }
 
@@ -310,14 +310,14 @@
   }
 
   .panel-info {
-    border-color: #4d6f9d;
+    border-color: #c39b67;
   }
 
   .jump-link {
     width: fit-content;
     text-decoration: none;
-    color: #f8fafc;
-    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    color: #fff9ef;
+    background: linear-gradient(135deg, #b8824a, #9f6f3d);
     border-radius: 999px;
     padding: 0.45rem 0.72rem;
     font-size: 0.9rem;

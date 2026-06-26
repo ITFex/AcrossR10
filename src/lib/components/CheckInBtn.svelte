@@ -72,19 +72,21 @@
     width: 100%;
     min-height: 56px;
     padding: 0.75rem 1rem;
-    border: 0;
+    border: 1px solid #cab08a;
     border-radius: 0.75rem;
     font-size: 1rem;
     font-weight: 700;
     line-height: 1.2;
-    color: #f8fafc;
-    background: #334155;
+    color: #6a5033;
+    background: #f2e2cd;
     cursor: not-allowed;
     transition: transform 120ms ease, background-color 120ms ease;
   }
 
   button.active {
-    background: #15803d;
+    border-color: #9f6f3d;
+    color: #fff9ef;
+    background: #a67541;
     cursor: pointer;
   }
 

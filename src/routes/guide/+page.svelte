@@ -140,8 +140,8 @@
   }
 
   .guide-panel {
-    border: 1px solid #2f4f66;
-    background: linear-gradient(160deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96));
+    border: 1px solid #d1b48f;
+    background: linear-gradient(160deg, rgba(248, 238, 224, 0.98), rgba(240, 224, 203, 0.98));
   }
 
   h1,
@@ -158,16 +158,16 @@
   }
 
   .stat-card {
-    border: 1px solid #35566f;
+    border: 1px solid #d1b48f;
     border-radius: 0.65rem;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(251, 244, 234, 0.95);
     padding: 0.65rem;
     display: grid;
     gap: 0.3rem;
   }
 
   .stat-label {
-    color: #93c5fd;
+    color: #8b6a48;
     font-size: 0.82rem;
   }
 
@@ -182,9 +182,9 @@
   }
 
   .info-card {
-    border: 1px solid #35566f;
+    border: 1px solid #d1b48f;
     border-radius: 0.65rem;
-    background: rgba(15, 23, 42, 0.45);
+    background: rgba(249, 241, 229, 0.94);
     padding: 0.7rem;
     display: grid;
     gap: 0.35rem;
@@ -212,7 +212,7 @@
   }
 
   .segment-title span {
-    color: #86efac;
+    color: #8f6a3f;
     font-weight: 600;
     white-space: nowrap;
   }
@@ -223,10 +223,10 @@
   }
 
   .faq-item {
-    border: 1px dashed #35566f;
+    border: 1px dashed #ccaf89;
     border-radius: 0.65rem;
     padding: 0.65rem;
-    background: rgba(12, 18, 34, 0.5);
+    background: rgba(251, 244, 235, 0.96);
   }
 
   @media (min-width: 760px) {

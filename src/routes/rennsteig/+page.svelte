@@ -203,10 +203,10 @@
   }
 
   .rennsteig-panel {
-    border: 1px solid #3f6f4f;
+    border: 1px solid #ceb08b;
     background:
-      linear-gradient(160deg, rgba(18, 42, 29, 0.92), rgba(15, 23, 42, 0.94)),
-      radial-gradient(circle at 10% 10%, rgba(134, 239, 172, 0.18), transparent 36%);
+      linear-gradient(160deg, rgba(248, 238, 224, 0.98), rgba(239, 223, 202, 0.98)),
+      radial-gradient(circle at 10% 10%, rgba(184, 148, 109, 0.16), transparent 36%);
   }
 
   h1,
@@ -223,16 +223,16 @@
   }
 
   .stat-card {
-    border: 1px solid #35566f;
+    border: 1px solid #d1b48f;
     border-radius: 0.65rem;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(251, 244, 234, 0.95);
     padding: 0.65rem;
     display: grid;
     gap: 0.3rem;
   }
 
   .stat-label {
-    color: #93c5fd;
+    color: #8b6a48;
     font-size: 0.82rem;
   }
 
@@ -242,7 +242,7 @@
   }
 
   .stat-card-strong {
-    border-color: #3d7550;
+    border-color: #bc9562;
   }
 
   .info-grid {
@@ -251,9 +251,9 @@
   }
 
   .info-card {
-    border: 1px solid #35566f;
+    border: 1px solid #d1b48f;
     border-radius: 0.65rem;
-    background: rgba(15, 23, 42, 0.45);
+    background: rgba(249, 241, 229, 0.94);
     padding: 0.7rem;
     display: grid;
     gap: 0.35rem;
@@ -266,8 +266,8 @@
   }
 
   .info-card-strong {
-    border-color: #3d7550;
-    background: rgba(13, 32, 22, 0.5);
+    border-color: #bc9562;
+    background: rgba(244, 233, 217, 0.96);
   }
 
   .guidelines-list {
@@ -283,22 +283,22 @@
   }
 
   .faq-item {
-    border: 1px dashed #35566f;
+    border: 1px dashed #ccb089;
     border-radius: 0.65rem;
     padding: 0.65rem;
-    background: rgba(12, 18, 34, 0.5);
+    background: rgba(251, 244, 235, 0.96);
   }
 
   .faq-item-strong {
-    border-color: #4e8e65;
-    background: rgba(13, 30, 21, 0.58);
+    border-color: #bc9562;
+    background: rgba(245, 235, 219, 0.96);
   }
 
   .source-note {
     margin-top: 0.4rem;
     font-size: 0.86rem;
     line-height: 1.45;
-    color: #c8e6d2;
+    color: #7c6243;
   }
 
   @media (min-width: 760px) {

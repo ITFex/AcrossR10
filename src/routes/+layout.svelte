@@ -34,6 +34,10 @@
 <style>
 	.layout-shell {
 		min-height: 100vh;
+		background:
+			radial-gradient(circle at 0% 0%, rgba(205, 177, 140, 0.2), transparent 40%),
+			radial-gradient(circle at 100% 20%, rgba(176, 142, 102, 0.18), transparent 42%),
+			#f3e7d5;
 	}
 
 	.topbar {
@@ -47,8 +51,9 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8));
+		background: linear-gradient(180deg, rgba(244, 232, 214, 0.96), rgba(244, 232, 214, 0.84));
 		backdrop-filter: blur(7px);
+		border-bottom: 1px solid #d8c2a2;
 	}
 
 	.brand {
@@ -62,13 +67,13 @@
 	}
 
 	.brand-name {
-		color: #f8fafc;
+		color: #4f3a25;
 		font-size: 1.18rem;
 		font-weight: 700;
 	}
 
 	.brand-sub {
-		color: #cbd5e1;
+		color: #7c6243;
 		font-size: 0.82rem;
 	}
 
@@ -79,25 +84,25 @@
 	}
 
 	.main-nav a {
-		color: #cbd5e1;
+		color: #6e5437;
 		text-decoration: none;
 		font-weight: 600;
 		font-size: 0.9rem;
 		padding: 0.42rem 0.72rem;
 		border-radius: 999px;
-		border: 1px solid #35506c;
-		background: rgba(15, 23, 42, 0.55);
+		border: 1px solid #ccb18a;
+		background: rgba(247, 237, 223, 0.86);
 		transition: 120ms ease-in-out;
 	}
 
 	.main-nav a:hover {
-		border-color: #60a5fa;
-		color: #f8fafc;
+		border-color: #b8824a;
+		color: #4f3a25;
 	}
 
 	.main-nav a.active {
-		background: linear-gradient(135deg, #0284c7, #1d4ed8);
+		background: linear-gradient(135deg, #b8824a, #9f6f3d);
 		border-color: transparent;
-		color: #f8fafc;
+		color: #fff9ef;
 	}
 </style>
