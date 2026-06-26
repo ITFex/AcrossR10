@@ -150,7 +150,7 @@
 <section class="gpx-card" aria-label={title}>
   <header>
     <h3>{title}</h3>
-    <p>Beispieltrack fur das eintagige Rennformat, inkl. visualisierter Strecke.</p>
+    <p>Beispieltrack für das eintägige Rennformat, inkl. visualisierter Strecke.</p>
   </header>
 
   {#if loading}
@@ -194,7 +194,7 @@
 
     {#if shownWaypoints.length > 0}
       <div class="waypoint-box">
-        <h4>Ausgewahlte Wegpunkte</h4>
+        <h4>Ausgewählte Wegpunkte</h4>
         <ul>
           {#each shownWaypoints as waypoint}
             <li>{waypoint.name}</li>

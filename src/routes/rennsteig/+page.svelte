@@ -45,24 +45,24 @@
   ];
 
   const highlights = [
-    'Eintagiges Rennformat mit frei wahlbarer Startzeit innerhalb des Eventfensters',
-    'Teilnahme solo oder in selbst organisierter Kleingruppe moglich',
+    'Eintägiges Rennformat mit frei wählbarer Startzeit innerhalb des Eventfensters',
+    'Teilnahme solo oder in selbst organisierter Kleingruppe möglich',
     'Markante Punkte wie Burg Elgersburg, Mönchhof und Aussichtspassagen',
-    'Technisch moderat mit hoher Fahrfrequenz auf wechselnden Walduntergrunden'
+    'Technisch moderat mit hoher Fahrfrequenz auf wechselnden Walduntergründen'
   ];
 
   const mustKnow = [
     'Die Veranstaltung ist als One-Day-Race geplant: kein offizieller Massenstart.',
-    'Jede Person oder Gruppe fahrt in Eigenverantwortung mit eigener Navigation.',
-    'Tracknachweis uber GPX-Aufzeichnung (z. B. Bikecomputer/Komoot/Garmin).',
-    'Offline-Karte + GPX sind auf Teilstucken ohne stabiles Netz Pflicht.'
+    'Jede Person oder Gruppe fährt in Eigenverantwortung mit eigener Navigation.',
+    'Tracknachweis über GPX-Aufzeichnung (z. B. Bikecomputer/Komoot/Garmin).',
+    'Offline-Karte + GPX sind auf Teilstücken ohne stabiles Netz Pflicht.'
   ];
 
   const stageNotes = [
     {
       title: 'Westabschnitt: Hörschel → Oberhof',
-      profile: 'Langer Anstieg, stetiger Hohengewinn, fordernde Forstwege.',
-      hint: 'Fruh starten und Verpflegung fur langere Distanz mitnehmen.'
+      profile: 'Langer Anstieg, stetiger Höhengewinn, fordernde Forstwege.',
+      hint: 'Früh starten und Verpflegung für längere Distanz mitnehmen.'
     },
     {
       title: 'Mittelteil: Oberhof -> Neuhaus',
@@ -98,19 +98,19 @@
   const faqItems = [
     {
       q: 'Kann ich auch allein starten?',
-      a: 'Ja. Das Event ist explizit fur Solo-Starts und Gruppenstarts ohne zentrale Formation ausgelegt.'
+      a: 'Ja. Das Event ist explizit für Solo-Starts und Gruppenstarts ohne zentrale Formation ausgelegt.'
     },
     {
       q: 'Darf ich in einer spontanen Gruppe fahren?',
-      a: 'Ja. Gruppen konnen sich selbst organisieren. Tempo, Pausen und Navigation werden eigenstandig abgestimmt.'
+      a: 'Ja. Gruppen können sich selbst organisieren. Tempo, Pausen und Navigation werden eigenständig abgestimmt.'
     },
     {
       q: 'Wie wird die absolvierte Strecke nachgewiesen?',
-      a: 'Uber eine durchgehende GPX-Aufzeichnung plus Zieleintrag im Event-Check-in.'
+      a: 'Über eine durchgehende GPX-Aufzeichnung plus Zieleintrag im Event-Check-in.'
     },
     {
       q: 'Gibt es eine Abbruchstrategie?',
-      a: 'Ja. Mehrere Orte entlang der Strecke haben Taxi-/Bahn-/Busoptionen fur einen sicheren Ruckweg.'
+      a: 'Ja. Mehrere Orte entlang der Strecke haben Taxi-/Bahn-/Busoptionen für einen sicheren Rückweg.'
     }
   ];
 
@@ -123,44 +123,44 @@
     {
       name: 'Schmiedefeld am Rennsteig',
       type: 'Bäcker / Markt / Gastronomie',
-      hint: 'Sehr guter Vor- und Nachversorgungs-Hub mit kurzer Distanz zu Unterkunften.'
+      hint: 'Sehr guter Vor- und Nachversorgungs-Hub mit kurzer Distanz zu Unterkünften.'
     },
     {
       name: 'Elgersburg (Ortsbereich)',
       type: 'Nahversorgung / Brunnen / Gastro',
-      hint: 'Flexible Nachfulloption kurz vor den langere Waldpassagen.'
+      hint: 'Flexible Nachfülloption kurz vor den längeren Waldpassagen.'
     }
   ];
 
   const accommodations = [
     {
       area: 'Schmiedefeld am Rennsteig',
-      text: 'Ideal als Race-Base fur Anreise am Vortag und Regeneration nach dem Zieleinlauf.'
+      text: 'Ideal als Race-Base für Anreise am Vortag und Regeneration nach dem Zieleinlauf.'
     },
     {
       area: 'Oberhof',
-      text: 'Gute Auswahl an Hotels/Pensionen, geeignet fur Teams oder Begleitpersonen.'
+      text: 'Gute Auswahl an Hotels/Pensionen, geeignet für Teams oder Begleitpersonen.'
     },
     {
       area: 'Neuhaus am Rennweg',
-      text: 'Ruhigere Alternative mit guter Erreichbarkeit fur pre-/post-race Ubernachtung.'
+      text: 'Ruhigere Alternative mit guter Erreichbarkeit für Pre-/Post-Race-Übernachtung.'
     }
   ];
 
   const camping = [
-    'Basislager in Oberhof oder Neuhaus fur sternformige Tagesloops.',
-    'Vorab prufen, welche Unterkunfte sicheren Bike-Abstellraum anbieten.',
-    'Bei Biwak-Planung nur freigegebene Flachen und lokale Regeln beachten.'
+    'Basislager in Oberhof oder Neuhaus für sternförmige Tagesloops.',
+    'Vorab prüfen, welche Unterkünfte sicheren Bike-Abstellraum anbieten.',
+    'Bei Biwak-Planung nur freigegebene Flächen und lokale Regeln beachten.'
   ];
 
   const foodAndWater = [
-    'Regelmasig Nachfullen in Ortschaften einplanen, nicht auf einzelne Quellen verlassen.',
+    'Regelmäßig nachfüllen in Ortschaften einplanen, nicht auf einzelne Quellen verlassen.',
     'Wochenenden bieten bessere Einkehrdichte als ruhige Wochentage.',
-    'Energiereserve fur 2-3 Stunden extra Fahrzeit mitfuhren.'
+    'Energiereserve für 2-3 Stunden extra Fahrzeit mitführen.'
   ];
 
   const resources = [
-    'Rennsteig-Shuttle und regionale Fahrplane fur Rucktransfers',
+    'Rennsteig-Shuttle und regionale Fahrpläne für Rücktransfers',
     'Lokale Wetter- und Wegesperrungsinfos aus den Tourismusorten',
     'Saisonhinweise zu Waldarbeiten und Forstsperrungen'
   ];
@@ -188,9 +188,9 @@
     <p class="meta-line">LOCATION THURINGIA, GERMANY</p>
     <h1>Rennsteig One-Day Race</h1>
     <p class="dek">
-      Das Event ist als eintagiges Rennen gestaltet und kann individuell solo oder in selbst
+      Das Event ist als eintägiges Rennen gestaltet und kann individuell solo oder in selbst
       organisierten Gruppen gefahren werden. Der bereitgestellte GPX-Track bildet die verbindliche
-      Rennlinie fur Navigation und Nachweis.
+      Rennlinie für Navigation und Nachweis.
     </p>
     <figure class="hero-art">
       <img
@@ -214,7 +214,7 @@
       <h2>Route Difficulty</h2>
       <p>
         Das One-Day-Race ist fahrtechnisch moderat, konditionell jedoch anspruchsvoll durch Dauer,
-        Hohenmeter und wechselnde Bodenverhaltnisse. Gute Pacing-Strategie und verlassliche
+        Höhenmeter und wechselnde Bodenverhältnisse. Gute Pacing-Strategie und verlässliche
         Eigenverpflegung machen den Unterschied im letzten Renndrittel.
       </p>
 
@@ -345,7 +345,7 @@
 
       <p class="terms">
         Terms of use: Die Route ist eine Planungsgrundlage. Vor der Fahrt aktuelle Bedingungen,
-        Sperrungen und Wetterlage prufen und die Strecke auf eigenes Risiko befahren.
+        Sperrungen und Wetterlage prüfen und die Strecke auf eigenes Risiko befahren.
       </p>
     </article>
 
