@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import CheckInBtn from '$lib/components/CheckInBtn.svelte';
   import location from '$lib/stores/location';
-  import leaderboard from '$lib/stores/leaderboard';
   import memberTracking from '$lib/stores/memberTracking';
   import { locale } from '$lib/stores/i18n';
   import { haversineDistanceMeters } from '$lib/utils/haversine';
@@ -10,11 +9,7 @@
   const GEOFENCE_RADIUS_METERS = 50;
   const RIDER_NAME_KEY = 'acrossr10.current-rider';
 
-  const pois = [
-    { id: 1, name: 'Rastplatz Nord', latitude: 52.5208, longitude: 13.4095 },
-    { id: 2, name: 'Fahrradstation Süd', latitude: 52.5173, longitude: 13.3928 },
-    { id: 3, name: 'Aussichtspunkt West', latitude: 52.5124, longitude: 13.3777 }
-  ];
+  let pois = [];
 
   let checkedInPoi = null;
   let checkedInAt = null;
@@ -25,6 +20,12 @@
   let riderName = '';
   let riderHint = '';
   let scorePreview = 100;
+  let isLoadingPois = false;
+  let poiLoadError = '';
+  let currentGeofenceRadius = GEOFENCE_RADIUS_METERS;
+  let accessCode = '';
+  let isAuthorized = false;
+  let authError = '';
 
   const copy = {
     de: {
@@ -36,6 +37,10 @@
       riderNameLabel: 'Name für die ewige Bestenliste',
       riderNamePlaceholder: 'z. B. Lena, Markus, Team Waldritt',
       riderNameHint: 'Der Name bleibt lokal gespeichert und wird für alle kommenden Check-ins genutzt.',
+      accessCodeLabel: 'Zugangscode',
+      accessCodePlaceholder: 'Mitgliedercode eingeben',
+      accessCodeHint: 'Für serverseitige Check-ins ist eine Anmeldung erforderlich.',
+      accessCodeButton: 'Anmelden',
       location: 'Standort',
       lat: 'Lat',
       lon: 'Lon',
@@ -46,24 +51,28 @@
       inGeofence: 'Du bist im Geofence (Radius {radius}m).',
       outsideGeofence: 'Außerhalb des Geofence-Radius ({radius}m).',
       noPoi: 'Kein POI verfügbar.',
+      loadingPois: 'POIs werden geladen...',
+      poiLoadError: 'POIs konnten nicht geladen werden.',
       checkin: 'Check-in',
       activeCheckin: 'Jetzt einchecken',
       inactiveCheckin: 'Check-in nicht verfügbar',
       stillAway: 'Noch {distance}m entfernt',
       checkedInAt: 'Eingecheckt bei {poi} am {date} um {time}',
+      checkedInPoints: '{points} Punkte gutgeschrieben',
       history: 'Check-in Historie',
       distance: 'Distanz',
       noHistory: 'Noch keine Meldungen erfasst.',
       scoreInfo: 'Wertung und weitere Infos',
       scoreNotes: [
         'Jeder Check-in bringt Punkte auf Basis der Distanz zum POI (nah = mehr Punkte).',
-        'Die ewige Bestenliste summiert alle Punkte und Check-ins dauerhaft.',
+        'Die ewige Bestenliste summiert alle Punkte und Check-ins in der lokalen PostgreSQL-Datenbank.',
         'Bei Punktgleichheit entscheidet zuerst die Anzahl der Check-ins, dann der Name.',
         'Die Auswertung findest du in der Rubrik Bestenliste.'
       ],
       gotoLeaderboard: 'Zur ewigen Bestenliste',
       hintNameFirst: 'Bitte zuerst einen Fahrernamen eingeben, damit Punkte in die ewige Bestenliste zählen.',
-      hintPointsCollected: '{name} hat Punkte für die ewige Bestenliste gesammelt.'
+      hintPointsCollected: '{name} hat Punkte für die ewige Bestenliste gesammelt.',
+      checkinFailed: 'Check-in fehlgeschlagen. Bitte erneut versuchen.'
     },
     en: {
       title: 'Live Check-in',
@@ -74,6 +83,10 @@
       riderNameLabel: 'Name for the all-time leaderboard',
       riderNamePlaceholder: 'e.g. Lena, Markus, Team Forest Ride',
       riderNameHint: 'Your name is stored locally and used for future check-ins.',
+      accessCodeLabel: 'Access code',
+      accessCodePlaceholder: 'Enter member code',
+      accessCodeHint: 'Login is required for server-side check-ins.',
+      accessCodeButton: 'Login',
       location: 'Location',
       lat: 'Lat',
       lon: 'Lon',
@@ -84,24 +97,28 @@
       inGeofence: 'You are inside the geofence (radius {radius}m).',
       outsideGeofence: 'Outside geofence radius ({radius}m).',
       noPoi: 'No POI available.',
+      loadingPois: 'Loading POIs...',
+      poiLoadError: 'Failed to load POIs.',
       checkin: 'Check-in',
       activeCheckin: 'Check in now',
       inactiveCheckin: 'Check-in unavailable',
       stillAway: '{distance}m away',
       checkedInAt: 'Checked in at {poi} on {date} at {time}',
+      checkedInPoints: '{points} points granted',
       history: 'Check-in history',
       distance: 'Distance',
       noHistory: 'No check-ins recorded yet.',
       scoreInfo: 'Scoring and details',
       scoreNotes: [
         'Each check-in awards points based on distance to the POI (closer = more points).',
-        'The all-time leaderboard accumulates points and check-ins permanently.',
+        'The all-time leaderboard accumulates points and check-ins in the local PostgreSQL database.',
         'If points are tied, check-in count comes first, then name.',
         'You can view the evaluation in the leaderboard section.'
       ],
       gotoLeaderboard: 'Go to all-time leaderboard',
       hintNameFirst: 'Please enter a rider name first so points can be counted on the leaderboard.',
-      hintPointsCollected: '{name} collected points for the all-time leaderboard.'
+      hintPointsCollected: '{name} collected points for the all-time leaderboard.',
+      checkinFailed: 'Check-in failed. Please try again.'
     }
   };
 
@@ -112,13 +129,44 @@
 
   $: userCoords = $location.coords;
   $: nearest = findNearestPoi(userCoords, pois);
-  $: isInsideGeofence = Boolean(nearest && nearest.distance <= GEOFENCE_RADIUS_METERS);
+  $: currentGeofenceRadius = Number(nearest?.poi?.geofence_radius_meters) || GEOFENCE_RADIUS_METERS;
+  $: isInsideGeofence = Boolean(nearest && nearest.distance <= currentGeofenceRadius);
   $: scorePreview = nearest ? Math.max(10, 100 - Math.min(90, Math.round(nearest.distance))) : 100;
 
+  const loadPois = async () => {
+    isLoadingPois = true;
+    poiLoadError = '';
+
+    try {
+      const response = await fetch('/api/pois');
+      const body = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(body.error || t.poiLoadError);
+      }
+
+      pois = Array.isArray(body.pois) ? body.pois : [];
+    } catch (error) {
+      poiLoadError = error?.message || t.poiLoadError;
+      pois = [];
+    } finally {
+      isLoadingPois = false;
+    }
+  };
+
   onMount(() => {
-    leaderboard.initialize();
     memberTracking.initialize();
     location.start();
+    loadPois();
+
+    fetch('/api/auth/session')
+      .then((response) => response.json())
+      .then((body) => {
+        isAuthorized = Boolean(body?.authenticated);
+      })
+      .catch(() => {
+        isAuthorized = false;
+      });
 
     if (typeof localStorage !== 'undefined') {
       riderName = localStorage.getItem(RIDER_NAME_KEY) || '';
@@ -180,7 +228,7 @@
       : null;
   }
 
-  function handleCheckIn(event) {
+  async function handleCheckIn(event) {
     const timestamp = new Date();
     const normalizedName = riderName.trim();
 
@@ -201,14 +249,59 @@
       return;
     }
 
-    leaderboard.addCheckIn({
-      riderName: normalizedName,
-      poiId: event.detail.poi.id,
-      distance: event.detail.distance,
-      timestamp
-    });
+    if (!isAuthorized) {
+      riderHint = t.checkinFailed;
+      authError = 'Unauthorized';
+      return;
+    }
 
-    riderHint = formatText(t.hintPointsCollected, { name: normalizedName });
+    try {
+      const response = await fetch('/api/checkins', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          riderName: normalizedName,
+          poiId: event.detail.poi.id,
+          latitude: event.detail.userLocation?.latitude,
+          longitude: event.detail.userLocation?.longitude,
+          accuracy: $location.accuracy
+        })
+      });
+
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(body.error || t.checkinFailed);
+      }
+
+      riderHint = `${formatText(t.hintPointsCollected, { name: normalizedName })} · ${formatText(t.checkedInPoints, { points: body.points })}`;
+    } catch (error) {
+      riderHint = error?.message || t.checkinFailed;
+    }
+  }
+
+  async function loginWithAccessCode() {
+    authError = '';
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ accessCode })
+      });
+
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        authError = body.error || t.checkinFailed;
+        isAuthorized = false;
+        return;
+      }
+
+      isAuthorized = true;
+      authError = '';
+    } catch {
+      authError = t.checkinFailed;
+      isAuthorized = false;
+    }
   }
 </script>
 
@@ -217,7 +310,7 @@
     <h1>{t.title}</h1>
     <p>{t.subtitle}</p>
     <div class="hero-meta">
-      <span>{t.geofenceRadius}: {GEOFENCE_RADIUS_METERS} m</span>
+      <span>{t.geofenceRadius}: {currentGeofenceRadius} m</span>
       <span>{t.scorePreview}: {scorePreview}</span>
     </div>
   </header>
@@ -233,6 +326,21 @@
       on:input={(event) => saveRiderName(event.currentTarget.value)}
     />
     <p class="subtle">{t.riderNameHint}</p>
+
+    <label for="access-code">{t.accessCodeLabel}</label>
+    <input
+      id="access-code"
+      type="password"
+      placeholder={t.accessCodePlaceholder}
+      value={accessCode}
+      on:input={(event) => (accessCode = event.currentTarget.value)}
+    />
+    <button class="login-btn" on:click={loginWithAccessCode}>{t.accessCodeButton}</button>
+    <p class="subtle">{t.accessCodeHint}</p>
+    {#if authError}
+      <p class="error">{authError}</p>
+    {/if}
+
     {#if riderHint}
       <p class="inside">{riderHint}</p>
     {/if}
@@ -253,14 +361,18 @@
 
   <section class="panel">
     <h2>{t.nearestPoi}</h2>
-    {#if nearest}
+    {#if isLoadingPois}
+      <p>{t.loadingPois}</p>
+    {:else if poiLoadError}
+      <p class="error">{poiLoadError}</p>
+    {:else if nearest}
       <p>{nearest.poi.name}</p>
       <p>{Math.round(nearest.distance)}m {t.distanceAway}</p>
       <p class:inside={isInsideGeofence} class:outside={!isInsideGeofence}>
         {#if isInsideGeofence}
-          {formatText(t.inGeofence, { radius: GEOFENCE_RADIUS_METERS })}
+          {formatText(t.inGeofence, { radius: currentGeofenceRadius })}
         {:else}
-          {formatText(t.outsideGeofence, { radius: GEOFENCE_RADIUS_METERS })}
+          {formatText(t.outsideGeofence, { radius: currentGeofenceRadius })}
         {/if}
       </p>
     {:else}
@@ -273,7 +385,7 @@
     <CheckInBtn
       userLocation={userCoords}
       {pois}
-      threshold={GEOFENCE_RADIUS_METERS}
+      threshold={currentGeofenceRadius}
       activeLabel={t.activeCheckin}
       inactiveLabel={t.inactiveCheckin}
       formatDistanceLabel={(distance) => formatText(t.stillAway, { distance: Math.round(distance) })}
@@ -425,6 +537,19 @@
 
   .panel-info {
     border-color: #c39b67;
+  }
+
+  .login-btn {
+    width: fit-content;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #8b5f36, #6f4829);
+    color: #fff9ef;
+    padding: 0.35rem 0.7rem;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
   }
 
   .jump-link {

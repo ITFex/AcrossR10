@@ -1,16 +1,17 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import { getSupabaseClient, isSupabaseConfigured } from '$lib/supabase/client';
 
 const SELF_ID_KEY = 'acrossr10.member-self-id';
-const TABLE_NAME = 'member_locations';
 const HEARTBEAT_MS = 5000;
+const SNAPSHOT_MS = 5000;
+const SNAPSHOT_LOOKBACK_MINUTES = 15;
+const API_BASE = '/api/member-locations';
 
 const defaultState = {
   members: [],
   ready: false,
   error: null,
-  backend: 'supabase'
+  backend: 'postgres'
 };
 
 const normalizeMember = (entry = {}, source = 'remote') => {
@@ -59,10 +60,10 @@ const isFresh = (isoDate, thresholdMs = 90_000) => {
 
 function createMemberTrackingStore() {
   const { subscribe, update, set } = writable(defaultState);
-  let channel = null;
   let started = false;
   let selfId = null;
   let lastHeartbeatAt = 0;
+  let pollTimer = null;
 
   const patchState = (patch) => {
     update((state) => ({
@@ -100,21 +101,10 @@ function createMemberTrackingStore() {
     });
   };
 
-  const removeMember = (memberId) => {
-    const id = String(memberId || '');
-    if (!id) return;
-
-    update((state) => ({
-      ...state,
-      members: state.members.filter((member) => member.id !== id)
-    }));
-  };
-
   const publishSelfState = async ({ name, coords, accuracy, status = 'active', force = false }) => {
-    const client = getSupabaseClient();
     const trimmedName = String(name || '').trim();
 
-    if (!client || !trimmedName) return;
+    if (!trimmedName) return;
 
     const now = Date.now();
     if (!force && now - lastHeartbeatAt < HEARTBEAT_MS) return;
@@ -134,33 +124,36 @@ function createMemberTrackingStore() {
       source: 'web'
     };
 
-    const { error } = await client.from(TABLE_NAME).upsert(payload, { onConflict: 'member_id' });
-    if (error) {
-      patchState({ error: `Supabase write failed: ${error.message}` });
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      patchState({ error: body.error || `Database write failed (${response.status}).` });
       return;
     }
 
+    const body = await response.json();
+
     patchState({ error: null });
-    applyMemberPatch(payload, 'self');
+    applyMemberPatch(body.member || payload, 'self');
   };
 
   const loadSnapshot = async () => {
-    const client = getSupabaseClient();
-    if (!client) return;
+    const response = await fetch(`${API_BASE}?sinceMinutes=${SNAPSHOT_LOOKBACK_MINUTES}`);
 
-    const threshold = new Date(Date.now() - 15 * 60_000).toISOString();
-    const { data, error } = await client
-      .from(TABLE_NAME)
-      .select('member_id,name,status,latitude,longitude,accuracy,last_seen,source')
-      .gte('last_seen', threshold)
-      .order('last_seen', { ascending: false });
-
-    if (error) {
-      patchState({ ready: true, error: `Supabase read failed: ${error.message}` });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      patchState({ ready: true, error: body.error || `Database read failed (${response.status}).` });
       return;
     }
 
-    const members = (data || [])
+    const body = await response.json();
+
+    const members = (body.members || [])
       .map((row) => normalizeMember(row, 'remote'))
       .filter((member) => member.id)
       .sort((a, b) => new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime());
@@ -168,42 +161,19 @@ function createMemberTrackingStore() {
     patchState({ members, ready: true, error: null });
   };
 
-  const startRealtime = () => {
-    if (!browser || channel) return;
-
-    const client = getSupabaseClient();
-    if (!client) return;
-
-    channel = client
-      .channel('member-locations-live')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: TABLE_NAME },
-        (payload) => applyMemberPatch(payload.new)
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: TABLE_NAME },
-        (payload) => applyMemberPatch(payload.new)
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: TABLE_NAME },
-        (payload) => removeMember(payload.old?.member_id)
-      )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          patchState({ ready: true, error: null });
-        }
+  const startPolling = () => {
+    if (!browser || pollTimer) return;
+    pollTimer = window.setInterval(() => {
+      loadSnapshot().catch(() => {
+        // Ignore transient polling errors; latest error is handled in loadSnapshot.
       });
+    }, SNAPSHOT_MS);
   };
 
-  const stopRealtime = () => {
-    const client = getSupabaseClient();
-    if (!client || !channel) return;
-
-    client.removeChannel(channel);
-    channel = null;
+  const stopPolling = () => {
+    if (!pollTimer) return;
+    clearInterval(pollTimer);
+    pollTimer = null;
   };
 
   return {
@@ -214,24 +184,16 @@ function createMemberTrackingStore() {
     },
     async initialize() {
       if (!browser) return;
-      if (!isSupabaseConfigured) {
-        set({
-          ...defaultState,
-          ready: true,
-          error: 'Supabase nicht konfiguriert (PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY fehlen).'
-        });
-        return;
-      }
 
       if (!selfId) selfId = getSelfId();
       if (started) return;
       started = true;
 
       await loadSnapshot();
-      startRealtime();
+      startPolling();
     },
     stop() {
-      stopRealtime();
+      stopPolling();
       started = false;
     },
     async setSelfProfile({ name, status = 'active' }) {

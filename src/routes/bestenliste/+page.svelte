@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import leaderboard from '$lib/stores/leaderboard';
   import { locale } from '$lib/stores/i18n';
 
   const copy = {
@@ -8,7 +7,7 @@
       kicker: 'Hall of Fame',
       title: 'Ewige Bestenliste',
       intro:
-        'Alle Punkte aus Check-ins werden dauerhaft lokal gespeichert. Je näher der Check-in am POI liegt, desto höher die Punktzahl pro Eintrag.',
+        'Alle Punkte aus Check-ins werden in der lokalen PostgreSQL-Datenbank gespeichert. Je näher der Check-in am POI liegt, desto höher die Punktzahl pro Eintrag.',
       participants: 'Teilnehmende',
       totalPoints: 'Gesamtpunkte',
       totalCheckins: 'Check-ins gesamt',
@@ -22,6 +21,8 @@
       poi: 'POIs',
       lastCheckin: 'Letzter Check-in',
       noData: 'Keine Daten vorhanden.',
+      loading: 'Bestenliste wird geladen...',
+      loadError: 'Bestenliste konnte nicht geladen werden.',
       moreInfo: 'Weitere Infos',
       notes: [
         'Punktelogik pro Check-in: mindestens 10, maximal 100 Punkte.',
@@ -34,7 +35,7 @@
       kicker: 'Hall of Fame',
       title: 'All-time Leaderboard',
       intro:
-        'All points from check-ins are stored locally and persist over time. The closer a check-in is to a POI, the more points are awarded.',
+        'All check-in points are stored in the local PostgreSQL database. The closer a check-in is to a POI, the more points are awarded.',
       participants: 'Participants',
       totalPoints: 'Total points',
       totalCheckins: 'Total check-ins',
@@ -48,6 +49,8 @@
       poi: 'POIs',
       lastCheckin: 'Last check-in',
       noData: 'No data available.',
+      loading: 'Loading leaderboard...',
+      loadError: 'Failed to load leaderboard.',
       moreInfo: 'More information',
       notes: [
         'Scoring per check-in: at least 10 and up to 100 points.',
@@ -60,17 +63,105 @@
 
   $: t = copy[$locale] ?? copy.de;
 
+  let riders = [];
+  let isLoading = false;
+  let loadError = '';
+  let refreshTimer = null;
+  let accessCode = '';
+  let isAuthorized = false;
+
+  const loginForLeaderboard = async () => {
+    loadError = '';
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ accessCode })
+      });
+
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(body.error || t.loadError);
+      }
+
+      isAuthorized = true;
+      await loadLeaderboard();
+      if (!refreshTimer) {
+        refreshTimer = window.setInterval(loadLeaderboard, 10_000);
+      }
+    } catch (error) {
+      loadError = error?.message || t.loadError;
+      isAuthorized = false;
+    }
+  };
+
+  const loadLeaderboard = async () => {
+    isLoading = true;
+    loadError = '';
+
+    try {
+      const response = await fetch('/api/leaderboard');
+      const body = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          isAuthorized = false;
+        }
+        throw new Error(body.error || t.loadError);
+      }
+
+      riders = Array.isArray(body.riders) ? body.riders : [];
+      isAuthorized = true;
+    } catch (error) {
+      loadError = error?.message || t.loadError;
+      riders = [];
+    } finally {
+      isLoading = false;
+    }
+  };
+
   onMount(() => {
-    leaderboard.initialize();
+    fetch('/api/auth/session')
+      .then((response) => response.json())
+      .then((body) => {
+        isAuthorized = Boolean(body?.authenticated);
+        if (isAuthorized) {
+          loadLeaderboard();
+          refreshTimer = window.setInterval(loadLeaderboard, 10_000);
+        }
+      })
+      .catch(() => {
+        isAuthorized = false;
+      });
+
+    return () => {
+      if (refreshTimer) clearInterval(refreshTimer);
+    };
   });
 
-  $: riders = $leaderboard.riders || [];
   $: topThree = riders.slice(0, 3);
   $: totalPoints = riders.reduce((sum, rider) => sum + rider.totalPoints, 0);
   $: totalCheckIns = riders.reduce((sum, rider) => sum + rider.totalCheckIns, 0);
 </script>
 
 <main>
+  {#if !isAuthorized}
+    <section class="panel">
+      <h2>{t.title}</h2>
+      <p>{t.loading}</p>
+      <input
+        type="password"
+        placeholder="ACROSSR10-MEMBER"
+        value={accessCode}
+        on:input={(event) => (accessCode = event.currentTarget.value)}
+      />
+      <button class="auth-btn" on:click={loginForLeaderboard}>Login</button>
+      {#if loadError}
+        <p>{loadError}</p>
+      {/if}
+    </section>
+  {:else}
   <header class="panel hero-panel">
     <p class="kicker">{t.kicker}</p>
     <h1>{t.title}</h1>
@@ -84,7 +175,11 @@
 
   <section class="panel">
     <h2>{t.podium}</h2>
-    {#if topThree.length > 0}
+    {#if isLoading}
+      <p>{t.loading}</p>
+    {:else if loadError}
+      <p>{loadError}</p>
+    {:else if topThree.length > 0}
       <div class="podium-grid">
         {#each topThree as rider, idx}
           <article class="podium-card">
@@ -102,7 +197,11 @@
 
   <section class="panel">
     <h2>{t.fullRanking}</h2>
-    {#if riders.length > 0}
+    {#if isLoading}
+      <p>{t.loading}</p>
+    {:else if loadError}
+      <p>{loadError}</p>
+    {:else if riders.length > 0}
       <div class="table-wrap">
         <table>
           <thead>
@@ -142,6 +241,7 @@
       {/each}
     </ul>
   </section>
+  {/if}
 </main>
 
 <style>
@@ -245,6 +345,29 @@
     padding-left: 1.15rem;
     display: grid;
     gap: 0.35rem;
+  }
+
+  input {
+    border: 1px solid #c9aa82;
+    border-radius: 0.65rem;
+    background: rgba(251, 245, 236, 0.92);
+    color: #4f3a25;
+    padding: 0.6rem 0.65rem;
+    font: inherit;
+    max-width: 20rem;
+  }
+
+  .auth-btn {
+    width: fit-content;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #8b5f36, #6f4829);
+    color: #fff9ef;
+    padding: 0.4rem 0.75rem;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
   }
 
   @media (min-width: 760px) {

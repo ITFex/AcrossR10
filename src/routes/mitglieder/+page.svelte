@@ -5,7 +5,6 @@
   import { locale } from '$lib/stores/i18n';
 
   const ACCESS_CODE = 'ACROSSR10-MEMBER';
-  const ACCESS_KEY = 'acrossr10.member-access';
 
   const routeMarkers = [
     {
@@ -28,6 +27,7 @@
   let enteredCode = '';
   let gateError = '';
   let isAuthorized = false;
+  let sessionRole = '';
   let selfMemberId = '';
 
   const copy = {
@@ -39,10 +39,11 @@
       accessCodePlaceholder: 'Code eingeben',
       openArea: 'Bereich öffnen',
       invalidCode: 'Ungültiger Zugangscode.',
+      authFailed: 'Anmeldung fehlgeschlagen.',
       demoCode: 'Demo-Code',
       memberArea: 'Mitgliederbereich',
       liveTrackingTitle: 'Live-Tracking der Mitglieder',
-      realtimeHint: 'Positionen werden in Supabase Realtime synchronisiert.',
+      realtimeHint: 'Positionen werden mit der lokalen PostgreSQL-API synchronisiert.',
       activePositions: 'Aktive Positionen',
       totalMembers: 'Gesamt-Mitglieder',
       realtimeConnect: 'Realtime-Verbindung wird aufgebaut...',
@@ -67,10 +68,11 @@
       accessCodePlaceholder: 'Enter code',
       openArea: 'Open area',
       invalidCode: 'Invalid access code.',
+      authFailed: 'Login failed.',
       demoCode: 'Demo code',
       memberArea: 'Member area',
       liveTrackingTitle: 'Live tracking of members',
-      realtimeHint: 'Positions are synchronized via Supabase Realtime.',
+      realtimeHint: 'Positions are synchronized via the local PostgreSQL API.',
       activePositions: 'Active positions',
       totalMembers: 'Total members',
       realtimeConnect: 'Establishing realtime connection...',
@@ -99,32 +101,48 @@
     memberTracking.initialize();
     selfMemberId = memberTracking.getSelfId();
 
-    if (typeof localStorage !== 'undefined') {
-      isAuthorized = localStorage.getItem(ACCESS_KEY) === 'granted';
-    }
+    fetch('/api/auth/session')
+      .then((response) => response.json())
+      .then((body) => {
+        isAuthorized = Boolean(body?.authenticated);
+        sessionRole = body?.role || '';
+      })
+      .catch(() => {
+        isAuthorized = false;
+        sessionRole = '';
+      });
 
     return () => memberTracking.stop();
   });
 
-  const submitCode = () => {
-    if (enteredCode.trim().toUpperCase() !== ACCESS_CODE) {
-      gateError = t.invalidCode;
-      return;
-    }
-
+  const submitCode = async () => {
     gateError = '';
-    isAuthorized = true;
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(ACCESS_KEY, 'granted');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ accessCode: enteredCode })
+      });
+
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        gateError = body.error || t.invalidCode;
+        return;
+      }
+
+      isAuthorized = true;
+      sessionRole = body.role || '';
+    } catch {
+      gateError = t.authFailed;
     }
   };
 
-  const lockArea = () => {
+  const lockArea = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     isAuthorized = false;
+    sessionRole = '';
     enteredCode = '';
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(ACCESS_KEY);
-    }
   };
 
   const toRelativeTime = (isoDate) => {
@@ -163,7 +181,7 @@
         <p class="error">{gateError}</p>
       {/if}
 
-      <p class="subtle">{t.demoCode}: {ACCESS_CODE}</p>
+      <p class="subtle">{t.demoCode}: ACROSSR10-MEMBER / ACROSSR10-ADMIN</p>
     </section>
   {:else}
     <header class="panel hero-panel">
@@ -173,6 +191,7 @@
       <div class="meta">
         <span>{t.activePositions}: {members.filter((m) => m.status === 'active').length}</span>
         <span>{t.totalMembers}: {members.length}</span>
+        <span>Role: {sessionRole || 'member'}</span>
       </div>
       {#if $memberTracking.error}
         <p class="error">{$memberTracking.error}</p>
