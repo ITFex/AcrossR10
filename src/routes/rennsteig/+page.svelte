@@ -1,34 +1,34 @@
 <script>
   const rennsteigFacts = [
-    { label: 'Laenge (gesamt)', value: 'ca. 170 km' },
-    { label: 'Bundeslaender', value: 'Thueringen, Bayern, Hessen' },
-    { label: 'Klassische Richtung', value: 'Hoerschel -> Blankenstein' },
+    { label: 'Länge (gesamt)', value: '169,3 km' },
+    { label: 'Region', value: 'Thüringer Wald, Schiefergebirge, Frankenwald' },
+    { label: 'Klassische Richtung', value: 'Hörschel → Blankenstein' },
     { label: 'Empfohlene Bike-Tage', value: '2-4 Etappen' }
   ];
 
   const rennsteigStartOptions = [
     {
-      name: 'Hoerschel (bei Eisenach)',
+      name: 'Hörschel (bei Eisenach)',
       reason: 'Traditioneller Einstieg mit Symbolstart am Rennsteigbeginn.',
-      logistics: 'Bahnhofsnaehe in Eisenach, kurze Anfahrt zum Startpunkt.'
+      logistics: 'Bahnhofsnähe in Eisenach, kurze Anfahrt zum Startpunkt.'
     },
     {
       name: 'Oberhof',
-      reason: 'Zentraler Einstieg mit vielen Unterkuenften und Bike-freundlicher Infrastruktur.',
-      logistics: 'Gute Erreichbarkeit ueber A71 und Regionalverkehr.'
+      reason: 'Zentraler Einstieg mit vielen Unterkünften und Bike-freundlicher Infrastruktur.',
+      logistics: 'Gute Erreichbarkeit über A71 und Regionalverkehr.'
     },
     {
       name: 'Neuhaus am Rennweg',
-      reason: 'Starker Hub fuer Mittelabschnitte mit flexiblen Rundtour-Optionen.',
+      reason: 'Starker Hub für Mittelabschnitte mit flexiblen Rundtour-Optionen.',
       logistics: 'Parken im Ort, mehrere Einstiegspunkte in kurzer Distanz.'
     }
   ];
 
   const rennsteigEtappen = [
     {
-      title: 'Westabschnitt: Hoerschel -> Oberhof',
-      profile: 'Langer Anstieg, stetiger Hoehengewinn, fordernde Forstwege.',
-      hint: 'Frueh starten und Verpflegung fuer laengere Distanz mitnehmen.'
+      title: 'Westabschnitt: Hörschel → Oberhof',
+      profile: 'Langer Anstieg, stetiger Höhengewinn, fordernde Forstwege.',
+      hint: 'Früh starten und Verpflegung für längere Distanz mitnehmen.'
     },
     {
       title: 'Mittelteil: Oberhof -> Neuhaus am Rennweg',
@@ -37,32 +37,67 @@
     },
     {
       title: 'Ostteil: Neuhaus -> Blankenstein',
-      profile: 'Fluessigeres Terrain mit schnellen Abschnitten und Ortsdurchfahrten.',
-      hint: 'Auf touristischen Teilstuecken fruehzeitig Geschwindigkeit anpassen.'
+      profile: 'Flüssigeres Terrain mit schnellen Abschnitten und Ortsdurchfahrten.',
+      hint: 'Auf touristischen Teilstücken frühzeitig Geschwindigkeit anpassen.'
     }
   ];
 
   const rennsteigSeasonTips = [
-    'Mai bis Oktober ist in der Regel die verlaesslichste Bike-Saison am Rennsteig.',
+    'Mai bis Oktober ist in der Regel die verlässlichste Bike-Saison am Rennsteig.',
     'Nach Starkregen einzelne Waldwege meiden oder defensiv fahren.',
-    'Im Herbst mit nassem Laub und eingeschraenkter Sicht in den Waeldern rechnen.',
-    'Wasserpunkte und Einkehr nicht auf jeder Etappe eng getaktet verfuegbar.'
+    'Im Herbst mit nassem Laub und eingeschränkter Sicht in den Wäldern rechnen.',
+    'Wasserpunkte und Einkehr sind nicht auf jeder Etappe eng getaktet verfügbar.'
   ];
 
   const rennsteigSafetyChecklist = [
-    'Offline-Karte und GPX-Track auf dem Geraet und als Backup gespeichert',
+    'Offline-Karte und GPX-Track auf dem Gerät und als Backup gespeichert',
     'Wetterschutzschicht, da Bedingungen entlang des Kamms schnell wechseln',
-    'Lichtanlage auch tagsueber dabeihaben (Nebel- und Waldpassagen)',
-    'Notfallnummern und Standortfreigabe vor laengeren Solotouren abstimmen'
+    'Lichtanlage auch tagsüber dabeihaben (Nebel- und Waldpassagen)',
+    'Notfallnummern und Standortfreigabe vor längeren Solotouren abstimmen'
+  ];
+
+  const arrivalOptions = [
+    'Anreise mit dem Auto über A4, A71 und A73; von den Abfahrten führen Landstraßen in die Rennsteig-Orte.',
+    'Die A71 quert den Thüringer Wald durch den Rennsteigtunnel (7.916 m Länge).',
+    'Viele Orte entlang des Kamms haben Bahnhöfe oder Shuttle-Anbindungen, etwa über die Erfurter Bahn und den Rennsteig-Shuttle.',
+    'Für flexible Rückfahrten lohnt sich die Kombination aus Bahn und Bus (z. B. regionale Verkehrsverbünde in Thüringen).'
+  ];
+
+  const hikingAndBikeFormats = [
+    {
+      title: 'Etappenweise Touren',
+      text: 'Klassisch in mehreren Tagesabschnitten von Hörschel bis Blankenstein mit Übernachtungen entlang der Strecke.'
+    },
+    {
+      title: 'Wandern ohne Gepäck',
+      text: 'Mehrere Anbieter organisieren Gepäcktransfer zwischen den Unterkünften.'
+    },
+    {
+      title: 'Rundtour mit Basislager',
+      text: 'Ein fester Standort (z. B. Oberhof oder Neuhaus) eignet sich gut für sternförmige Tagesausfahrten.'
+    }
+  ];
+
+  const winterHighlights = [
+    'Rennsteig-Skiwanderweg: rund 140 km (Ascherbrück bei Ruhla bis Brennersgrün bei Lehesten), je nach Schneelage gespurt.',
+    'Thüringer Schneetelefon mit Infos zu Schneehöhen, geöffneten Loipen und Liften: 0800 7236488.',
+    'Zusätzliche Winteraktivitäten: Schneeschuhwandern, Rodeln, Snowtubing und Winterwanderungen.',
+    'Viele Orte bieten saisonale Unterkünfte und Winterpakete für kurze und längere Aufenthalte.'
+  ];
+
+  const infrastructureFacts = [
+    'Auf rennsteig.de werden über 300 Unterkünfte gelistet (u. a. Hotels, Pensionen, Ferienwohnungen, Ferienhäuser, Campingplätze).',
+    'Es gibt eigene Bereiche zu Etappenplanung, Karten, Wetter, Regionen/Orten und Reiseberichten.',
+    'Für die Planung hilfreich: Etappenübersicht mit acht Hauptetappen für die klassische Wanderroute.'
   ];
 </script>
 
 <main>
   <header class="panel rennsteig-panel">
-    <h1>Rennsteig in Thueringen</h1>
+    <h1>Rennsteig in Thüringen</h1>
     <p>
-      Kompakter Planungsbereich fuer Testtouren rund um den Rennsteig. Diese Inhalte sind als belastbare
-      Struktur angelegt und koennen mit finalen Daten verfeinert werden.
+      Ausgebauter Planungsbereich für Touren rund um den Rennsteig mit zusätzlichen Informationen zu
+      Verlauf, Etappen, Anreise, Infrastruktur und Winterbetrieb.
     </p>
   </header>
 
@@ -88,6 +123,13 @@
       {/each}
     </div>
 
+    <h3>Anreise kompakt</h3>
+    <ul class="guidelines-list">
+      {#each arrivalOptions as option}
+        <li>{option}</li>
+      {/each}
+    </ul>
+
     <h3>Abschnitte mit Charakter</h3>
     <div class="faq-list">
       {#each rennsteigEtappen as stage}
@@ -106,12 +148,41 @@
       {/each}
     </ul>
 
+    <h3>Tourformate</h3>
+    <div class="faq-list">
+      {#each hikingAndBikeFormats as format}
+        <article class="faq-item faq-item-strong">
+          <h4>{format.title}</h4>
+          <p>{format.text}</p>
+        </article>
+      {/each}
+    </div>
+
+    <h3>Winter am Rennsteig</h3>
+    <ul class="guidelines-list">
+      {#each winterHighlights as winterItem}
+        <li>{winterItem}</li>
+      {/each}
+    </ul>
+
+    <h3>Infrastruktur und Planung</h3>
+    <ul class="guidelines-list">
+      {#each infrastructureFacts as infra}
+        <li>{infra}</li>
+      {/each}
+    </ul>
+
     <h3>Sicherheits-Check vor dem Start</h3>
     <ul class="guidelines-list">
       {#each rennsteigSafetyChecklist as check}
         <li>{check}</li>
       {/each}
     </ul>
+
+    <p class="source-note">
+      Quellenhinweis: Die zusätzlichen Fakten wurden auf Basis öffentlich verfügbarer Informationen von
+      rennsteig.de (u. a. Bereiche „Anreise“, „Wandern“, „Winter“) zusammengefasst.
+    </p>
   </section>
 </main>
 
@@ -221,6 +292,13 @@
   .faq-item-strong {
     border-color: #4e8e65;
     background: rgba(13, 30, 21, 0.58);
+  }
+
+  .source-note {
+    margin-top: 0.4rem;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: #c8e6d2;
   }
 
   @media (min-width: 760px) {

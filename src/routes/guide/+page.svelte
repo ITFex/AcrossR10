@@ -1,7 +1,7 @@
 <script>
   const guideStats = [
-    { label: 'Rundenlaenge', value: '10.4 km' },
-    { label: 'Hoehenmeter', value: '+180 m' },
+    { label: 'Rundenlänge', value: '10.4 km' },
+    { label: 'Höhenmeter', value: '+180 m' },
     { label: 'Empfohlene Zeit', value: '50-90 min' },
     { label: 'Schwierigkeit', value: 'Leicht-Mittel' }
   ];
@@ -9,21 +9,21 @@
   const startPoints = [
     {
       name: 'Bahnhof Bergneustadt',
-      note: 'Guter Einstieg mit OePNV-Anbindung und Baecker in Laufweite.',
+      note: 'Guter Einstieg mit ÖPNV-Anbindung und Bäcker in Laufweite.',
       parking: 'P+R Westseite, begrenzt kostenfrei',
       surfaces: 'Asphalt / kurze Kopfsteinpflaster-Passage'
     },
     {
       name: 'Sportplatz Derschlag',
       note: 'Schneller Zugang auf den ruhigen Abschnitt entlang der Felder.',
-      parking: 'Vereinsparkplatz ausserhalb von Spielzeiten',
+      parking: 'Vereinsparkplatz außerhalb von Spielzeiten',
       surfaces: 'Asphalt / fester Schotter'
     },
     {
       name: 'Kesselweg 2, 51588 Malzhagen',
-      note: 'Test-Startpunkt fuer Geofence-Checks und Onboarding-Flow.',
-      parking: 'Strassenrand, bitte Zufahrten freihalten',
-      surfaces: 'Asphalt / Waldweg bei Naesse rutschig'
+      note: 'Test-Startpunkt für Geofence-Checks und Onboarding-Flow.',
+      parking: 'Straßenrand, bitte Zufahrten freihalten',
+      surfaces: 'Asphalt / Waldweg bei Nässe rutschig'
     }
   ];
 
@@ -31,7 +31,7 @@
     {
       title: 'Segment 1: Warm-up',
       distance: '0-3 km',
-      detail: 'Sanfter Einstieg mit breitem Belag. Ideal, um Trittfrequenz und Navigation zu pruefen.'
+      detail: 'Sanfter Einstieg mit breitem Belag. Ideal, um Trittfrequenz und Navigation zu prüfen.'
     },
     {
       title: 'Segment 2: Panorama-Kamm',
@@ -39,24 +39,24 @@
       detail: 'Leicht kupiertes Profil mit weitem Blick. Bei Seitenwind defensiv fahren.'
     },
     {
-      title: 'Segment 3: Technischer Rueckweg',
+      title: 'Segment 3: Technischer Rückweg',
       distance: '7-10.4 km',
-      detail: 'Kurviger, enger Abschnitt mit Wurzelkanten. Blickfuehrung aktiv halten.'
+      detail: 'Kurviger, enger Abschnitt mit Wurzelkanten. Blickführung aktiv halten.'
     }
   ];
 
   const faqItems = [
     {
       q: 'Brauche ich ein Gravelbike?',
-      a: 'Nein. Ein Trekking- oder Citybike reicht fuer den Dummy-Loop aus. Etwas breitere Reifen erhoehen den Komfort.'
+      a: 'Nein. Ein Trekking- oder Citybike reicht für den Dummy-Loop aus. Etwas breitere Reifen erhöhen den Komfort.'
     },
     {
       q: 'Wie funktionieren die Check-ins?',
-      a: 'Wenn du in den Geofence-Radius eines POI faehrst, wird der Button aktiv und du kannst den Check-in ausloesen.'
+      a: 'Wenn du in den Geofence-Radius eines POI fährst, wird der Button aktiv und du kannst den Check-in auslösen.'
     },
     {
       q: 'Gibt es Verpflegungspunkte?',
-      a: 'Fuer diese Testdaten sind zwei Wasserstopps und ein Cafe-Halt als Orientierung eingetragen.'
+      a: 'Für diese Testdaten sind zwei Wasserstopps und ein Café-Halt als Orientierung eingetragen.'
     }
   ];
 </script>
@@ -65,13 +65,13 @@
   <header class="panel guide-panel">
     <h1>Routen-Guide</h1>
     <p>
-      Strukturierte Dummy-Infos zu Startpunkten, Etappenplanung und Verhalten unterwegs. Inhalte koennen
-      spaeter mit Live-Daten ersetzt werden.
+      Strukturierte Dummy-Infos zu Startpunkten, Etappenplanung und Verhalten unterwegs. Inhalte können
+      später mit Live-Daten ersetzt werden.
     </p>
   </header>
 
   <section class="panel guide-panel">
-    <h2>Tour-Ueberblick</h2>
+    <h2>Tour-Überblick</h2>
     <div class="stats-grid">
       {#each guideStats as stat}
         <article class="stat-card">
@@ -105,9 +105,9 @@
 
     <h3>Kurze Verhaltensregeln</h3>
     <ul class="guidelines-list">
-      <li>Frueh sichtbar sein: Licht bei Daemmerung, reflektierende Elemente bei Waldpassagen.</li>
-      <li>Ruecksicht auf Anwohner und Fussgaenger, vor allem in engen Ortsdurchfahrten.</li>
-      <li>Bei Naesse auf den Schotterstuecken Tempo reduzieren und Bremsweg einplanen.</li>
+      <li>Früh sichtbar sein: Licht bei Dämmerung, reflektierende Elemente bei Waldpassagen.</li>
+      <li>Rücksicht auf Anwohner und Fußgänger, vor allem in engen Ortsdurchfahrten.</li>
+      <li>Bei Nässe auf den Schotterstücken Tempo reduzieren und Bremsweg einplanen.</li>
       <li>Notfallkontakt und minimalen Reparaturkit (Schlauch, Pumpe, Multitool) dabeihaben.</li>
     </ul>
 

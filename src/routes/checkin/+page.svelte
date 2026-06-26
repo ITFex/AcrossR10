@@ -2,9 +2,11 @@
   import { onMount } from 'svelte';
   import CheckInBtn from '$lib/components/CheckInBtn.svelte';
   import location from '$lib/stores/location';
+  import leaderboard from '$lib/stores/leaderboard';
   import { haversineDistanceMeters } from '$lib/utils/haversine';
 
   const GEOFENCE_RADIUS_METERS = 50;
+  const RIDER_NAME_KEY = 'acrossr10.current-rider';
 
   const pois = [
     { id: 1, name: 'Rastplatz Nord', latitude: 52.5208, longitude: 13.4095 },
@@ -18,15 +20,33 @@
   let userCoords = null;
   let nearest = null;
   let isInsideGeofence = false;
+  let riderName = '';
+  let riderHint = '';
+  let scorePreview = 100;
 
   $: userCoords = $location.coords;
   $: nearest = findNearestPoi(userCoords, pois);
   $: isInsideGeofence = Boolean(nearest && nearest.distance <= GEOFENCE_RADIUS_METERS);
+  $: scorePreview = nearest ? Math.max(10, 100 - Math.min(90, Math.round(nearest.distance))) : 100;
 
   onMount(() => {
+    leaderboard.initialize();
     location.start();
+
+    if (typeof localStorage !== 'undefined') {
+      riderName = localStorage.getItem(RIDER_NAME_KEY) || '';
+    }
+
     return () => location.stop();
   });
+
+  function saveRiderName(value) {
+    riderName = value;
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(RIDER_NAME_KEY, value);
+    }
+  }
 
   function findNearestPoi(user, items) {
     if (!user || !items?.length) return null;
@@ -52,6 +72,7 @@
 
   function handleCheckIn(event) {
     const timestamp = new Date();
+    const normalizedName = riderName.trim();
 
     checkedInPoi = event.detail.poi;
     checkedInAt = timestamp;
@@ -64,14 +85,48 @@
       },
       ...checkIns
     ];
+
+    if (!normalizedName) {
+      riderHint = 'Bitte zuerst einen Fahrernamen eingeben, damit Punkte in die ewige Bestenliste zählen.';
+      return;
+    }
+
+    leaderboard.addCheckIn({
+      riderName: normalizedName,
+      poiId: event.detail.poi.id,
+      distance: event.detail.distance,
+      timestamp
+    });
+
+    riderHint = `${normalizedName} hat Punkte für die ewige Bestenliste gesammelt.`;
   }
 </script>
 
 <main>
-  <header class="panel">
+  <header class="panel panel-hero">
     <h1>Live Check-in</h1>
-    <p>Standortdaten pruefen, naechsten POI finden und in der Geofence-Zone einchecken.</p>
+    <p>Standortdaten prüfen, nächsten POI finden und in der Geofence-Zone einchecken.</p>
+    <div class="hero-meta">
+      <span>Geofence-Radius: {GEOFENCE_RADIUS_METERS} m</span>
+      <span>Vorschau Punkte: {scorePreview}</span>
+    </div>
   </header>
+
+  <section class="panel panel-identity">
+    <h2>Fahrerprofil</h2>
+    <label for="rider-name">Name für die ewige Bestenliste</label>
+    <input
+      id="rider-name"
+      type="text"
+      placeholder="z. B. Lena, Markus, Team Waldritt"
+      value={riderName}
+      on:input={(event) => saveRiderName(event.currentTarget.value)}
+    />
+    <p class="subtle">Der Name bleibt lokal gespeichert und wird für alle kommenden Check-ins genutzt.</p>
+    {#if riderHint}
+      <p class="inside">{riderHint}</p>
+    {/if}
+  </section>
 
   <section class="panel">
     <h2>Standort</h2>
@@ -87,7 +142,7 @@
   </section>
 
   <section class="panel">
-    <h2>Naechster POI</h2>
+    <h2>Nächster POI</h2>
     {#if nearest}
       <p>{nearest.poi.name}</p>
       <p>{Math.round(nearest.distance)}m entfernt</p>
@@ -95,11 +150,11 @@
         {#if isInsideGeofence}
           Du bist im Geofence (Radius {GEOFENCE_RADIUS_METERS}m).
         {:else}
-          Ausserhalb des Geofence-Radius ({GEOFENCE_RADIUS_METERS}m).
+          Außerhalb des Geofence-Radius ({GEOFENCE_RADIUS_METERS}m).
         {/if}
       </p>
     {:else}
-      <p>Kein POI verfuegbar.</p>
+      <p>Kein POI verfügbar.</p>
     {/if}
   </section>
 
@@ -110,7 +165,7 @@
       {pois}
       threshold={GEOFENCE_RADIUS_METERS}
       activeLabel="Jetzt einchecken"
-      inactiveLabel="Check-in nicht verfuegbar"
+      inactiveLabel="Check-in nicht verfügbar"
       formatDistanceLabel={(distance) => `Noch ${Math.round(distance)}m entfernt`}
       on:checkin={handleCheckIn}
     />
@@ -139,6 +194,17 @@
       <p>Noch keine Meldungen erfasst.</p>
     {/if}
   </section>
+
+  <section class="panel panel-info">
+    <h2>Wertung und weitere Infos</h2>
+    <ul class="history-list">
+      <li>Jeder Check-in bringt Punkte auf Basis der Distanz zum POI (nah = mehr Punkte).</li>
+      <li>Die ewige Bestenliste summiert alle Punkte und Check-ins dauerhaft.</li>
+      <li>Bei Punktgleichheit entscheidet zuerst die Anzahl der Check-ins, dann der Name.</li>
+      <li>Die Auswertung findest du in der neuen Rubrik Bestenliste.</li>
+    </ul>
+    <a class="jump-link" href="/bestenliste">Zur ewigen Bestenliste</a>
+  </section>
 </main>
 
 <style>
@@ -151,12 +217,35 @@
   }
 
   .panel {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 0.75rem;
+    background: linear-gradient(160deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+    border: 1px solid #34516f;
+    border-radius: 0.9rem;
     padding: 1rem;
     display: grid;
     gap: 0.5rem;
+  }
+
+  .panel-hero {
+    border-color: #2f6f92;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .hero-meta span {
+    display: inline-flex;
+    border-radius: 999px;
+    border: 1px solid #3f6585;
+    background: rgba(15, 23, 42, 0.55);
+    padding: 0.25rem 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  .panel-identity {
+    border-color: #3f8b79;
   }
 
   h1,
@@ -168,6 +257,25 @@
   .error {
     color: #fca5a5;
     font-weight: 700;
+  }
+
+  label {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  input {
+    border: 1px solid #4e6f8f;
+    border-radius: 0.65rem;
+    background: rgba(15, 23, 42, 0.7);
+    color: #f8fafc;
+    padding: 0.6rem 0.65rem;
+    font: inherit;
+  }
+
+  .subtle {
+    color: #cbd5e1;
+    font-size: 0.86rem;
   }
 
   .success {
@@ -199,5 +307,20 @@
   h3 {
     margin: 0.25rem 0 0;
     font-size: 1rem;
+  }
+
+  .panel-info {
+    border-color: #4d6f9d;
+  }
+
+  .jump-link {
+    width: fit-content;
+    text-decoration: none;
+    color: #f8fafc;
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    border-radius: 999px;
+    padding: 0.45rem 0.72rem;
+    font-size: 0.9rem;
+    font-weight: 700;
   }
 </style>
