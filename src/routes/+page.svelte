@@ -49,6 +49,20 @@
       <p>Startpunkte, Etappencharakter und Taktik-Hinweise für effizientere Touren.</p>
       <a href="/guide">Zum Guide</a>
     </article>
+
+    <article class="panel focus-card">
+      <p class="mini-kicker">3D Preview</p>
+      <h2>Streckenvorschau</h2>
+      <p>Isometrische 3D Map Vorschau der Rennsteig-Strecke inkl. Höhenprofil.</p>
+      <a href="/rennsteig">3D Vorschau öffnen</a>
+    </article>
+
+    <article class="panel focus-card card-highlight">
+      <p class="mini-kicker">Members</p>
+      <h2>Internes LiveTracking</h2>
+      <p>Nur für Mitglieder: aktuelle Positionen in einer Live-Karte verfolgen.</p>
+      <a href="/mitglieder">Zum Mitgliederbereich</a>
+    </article>
   </section>
 
   <section class="grid">

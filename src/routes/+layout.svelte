@@ -5,6 +5,7 @@
 	const navItems = [
 		{ href: '/', label: 'Start' },
 		{ href: '/checkin', label: 'Check-in' },
+		{ href: '/mitglieder', label: 'Mitglieder' },
 		{ href: '/bestenliste', label: 'Bestenliste' },
 		{ href: '/guide', label: 'Guide' },
 		{ href: '/rennsteig', label: 'Rennsteig' }

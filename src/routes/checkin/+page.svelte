@@ -3,6 +3,7 @@
   import CheckInBtn from '$lib/components/CheckInBtn.svelte';
   import location from '$lib/stores/location';
   import leaderboard from '$lib/stores/leaderboard';
+  import memberTracking from '$lib/stores/memberTracking';
   import { haversineDistanceMeters } from '$lib/utils/haversine';
 
   const GEOFENCE_RADIUS_METERS = 50;
@@ -31,21 +32,45 @@
 
   onMount(() => {
     leaderboard.initialize();
+    memberTracking.initialize();
     location.start();
 
     if (typeof localStorage !== 'undefined') {
       riderName = localStorage.getItem(RIDER_NAME_KEY) || '';
     }
 
-    return () => location.stop();
+    return () => {
+      location.stop();
+      if (riderName.trim()) {
+        memberTracking.markSelfInactive({
+          name: riderName,
+          coords: userCoords,
+          accuracy: $location.accuracy
+        });
+      }
+      memberTracking.stop();
+    };
   });
 
   function saveRiderName(value) {
     riderName = value;
+    const trimmed = value.trim();
+
+    if (trimmed) {
+      memberTracking.setSelfProfile({ name: trimmed });
+    }
 
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(RIDER_NAME_KEY, value);
     }
+  }
+
+  $: if (riderName.trim() && userCoords) {
+    memberTracking.updateSelfLocation({
+      name: riderName,
+      coords: userCoords,
+      accuracy: $location.accuracy
+    });
   }
 
   function findNearestPoi(user, items) {

@@ -1,37 +1,70 @@
 <script>
-  const rennsteigFacts = [
-    { label: 'Länge (gesamt)', value: '169,3 km' },
-    { label: 'Region', value: 'Thüringer Wald, Schiefergebirge, Frankenwald' },
-    { label: 'Klassische Richtung', value: 'Hörschel → Blankenstein' },
-    { label: 'Empfohlene Bike-Tage', value: '2-4 Etappen' }
+  import MapPreview3D from '$lib/components/MapPreview3D.svelte';
+
+  const routeStats = [
+    { label: 'DISTANCE', value: '169.3 km' },
+    { label: 'DAYS', value: '2-4' },
+    { label: '% UNPAVED', value: '62%' },
+    { label: '% SINGLETRACK', value: '18%' },
+    { label: '% RIDEABLE', value: '96%' },
+    { label: 'TOTAL ASCENT', value: '3,120 m' },
+    { label: 'HIGH POINT', value: '973 m' },
+    { label: 'DIFFICULTY', value: '6 / 10' }
   ];
 
-  const rennsteigStartOptions = [
+  const routeScale = [
+    { label: 'CLIMBING SCALE', value: '18 m/km', detail: 'Steady climbs over long distances' },
+    { label: 'TECHNICAL', value: 'MODERATE', detail: 'Roots, loose gravel, wet forest lines' },
+    { label: 'PHYSICAL', value: 'MODERATE+', detail: 'Long days with repeated elevation gain' },
+    { label: 'LOGISTICS', value: 'EASY', detail: 'Villages and stations are regularly spaced' }
+  ];
+
+  const contributor = {
+    name: 'AcrossR10 Editorial Team',
+    role: 'Route Curation',
+    bio: 'Lokale Community-Rider und Tourenplaner, die den Rennsteig als Bikepacking-Linie fuhrbar, sicher und etappentauglich dokumentieren.'
+  };
+
+  const startPoints = [
     {
       name: 'Hörschel (bei Eisenach)',
       reason: 'Traditioneller Einstieg mit Symbolstart am Rennsteigbeginn.',
-      logistics: 'Bahnhofsnähe in Eisenach, kurze Anfahrt zum Startpunkt.'
+      logistics: 'Bahnhof Eisenach + kurzer Zubringer'
     },
     {
       name: 'Oberhof',
       reason: 'Zentraler Einstieg mit vielen Unterkünften und Bike-freundlicher Infrastruktur.',
-      logistics: 'Gute Erreichbarkeit über A71 und Regionalverkehr.'
+      logistics: 'Sehr gute Erreichbarkeit via A71'
     },
     {
       name: 'Neuhaus am Rennweg',
       reason: 'Starker Hub für Mittelabschnitte mit flexiblen Rundtour-Optionen.',
-      logistics: 'Parken im Ort, mehrere Einstiegspunkte in kurzer Distanz.'
+      logistics: 'Mehrere Einstiegspunkte + Parken im Ort'
     }
   ];
 
-  const rennsteigEtappen = [
+  const highlights = [
+    'Lange Kammabschnitte mit flussigem Rhythmus und weiten Waldpanoramen',
+    'Historische Rennsteig-Orte mit dichter Einkehr- und Brunnenstruktur',
+    'Kombinierbar als Overnighter, Wochenende oder 4-Tage-Etappenroute',
+    'Mehrere Bahnhofsoptionen fur flexible Start-/Zielplanung'
+  ];
+
+  const mustKnow = [
+    'Bei Dauerregen entstehen tiefe, weiche Forstspuren, besonders im Ostteil.',
+    'Nebel auf den Kammlagen kann Sicht und Orientierung stark reduzieren.',
+    'Einige Segmente sind stark frequentiert; defensives Fahren in Wanderzonen.',
+    'Offline-Karte + GPX sind auf Teilstucken ohne stabiles Netz Pflicht.'
+  ];
+
+  const stageNotes = [
     {
       title: 'Westabschnitt: Hörschel → Oberhof',
-      profile: 'Langer Anstieg, stetiger Höhengewinn, fordernde Forstwege.',
-      hint: 'Früh starten und Verpflegung für längere Distanz mitnehmen.'
+      profile: 'Langer Anstieg, stetiger Hohengewinn, fordernde Forstwege.',
+      hint: 'Fruh starten und Verpflegung fur langere Distanz mitnehmen.'
     },
     {
-      title: 'Mittelteil: Oberhof -> Neuhaus am Rennweg',
+      title: 'Mittelteil: Oberhof -> Neuhaus',
       profile: 'Abwechslungsreiche Kammwege, offene Landschaft und Waldwechsel.',
       hint: 'Bei Nebel Navigation auf Trackbasis nutzen.'
     },
@@ -42,272 +75,507 @@
     }
   ];
 
-  const rennsteigSeasonTips = [
-    'Mai bis Oktober ist in der Regel die verlässlichste Bike-Saison am Rennsteig.',
-    'Nach Starkregen einzelne Waldwege meiden oder defensiv fahren.',
-    'Im Herbst mit nassem Laub und eingeschränkter Sicht in den Wäldern rechnen.',
-    'Wasserpunkte und Einkehr sind nicht auf jeder Etappe eng getaktet verfügbar.'
+  const camping = [
+    'Basislager in Oberhof oder Neuhaus fur sternformige Tagesloops.',
+    'Vorab prufen, welche Unterkunfte sicheren Bike-Abstellraum anbieten.',
+    'Bei Biwak-Planung nur freigegebene Flachen und lokale Regeln beachten.'
   ];
 
-  const rennsteigSafetyChecklist = [
-    'Offline-Karte und GPX-Track auf dem Gerät und als Backup gespeichert',
-    'Wetterschutzschicht, da Bedingungen entlang des Kamms schnell wechseln',
-    'Lichtanlage auch tagsüber dabeihaben (Nebel- und Waldpassagen)',
-    'Notfallnummern und Standortfreigabe vor längeren Solotouren abstimmen'
+  const foodAndWater = [
+    'Regelmasig Nachfullen in Ortschaften einplanen, nicht auf einzelne Quellen verlassen.',
+    'Wochenenden bieten bessere Einkehrdichte als ruhige Wochentage.',
+    'Energiereserve fur 2-3 Stunden extra Fahrzeit mitfuhren.'
   ];
 
-  const arrivalOptions = [
-    'Anreise mit dem Auto über A4, A71 und A73; von den Abfahrten führen Landstraßen in die Rennsteig-Orte.',
-    'Die A71 quert den Thüringer Wald durch den Rennsteigtunnel (7.916 m Länge).',
-    'Viele Orte entlang des Kamms haben Bahnhöfe oder Shuttle-Anbindungen, etwa über die Erfurter Bahn und den Rennsteig-Shuttle.',
-    'Für flexible Rückfahrten lohnt sich die Kombination aus Bahn und Bus (z. B. regionale Verkehrsverbünde in Thüringen).'
+  const resources = [
+    'Rennsteig-Shuttle und regionale Fahrplane fur Rucktransfers',
+    'Lokale Wetter- und Wegesperrungsinfos aus den Tourismusorten',
+    'Saisonhinweise zu Waldarbeiten und Forstsperrungen'
   ];
 
-  const hikingAndBikeFormats = [
-    {
-      title: 'Etappenweise Touren',
-      text: 'Klassisch in mehreren Tagesabschnitten von Hörschel bis Blankenstein mit Übernachtungen entlang der Strecke.'
-    },
-    {
-      title: 'Wandern ohne Gepäck',
-      text: 'Mehrere Anbieter organisieren Gepäcktransfer zwischen den Unterkünften.'
-    },
-    {
-      title: 'Rundtour mit Basislager',
-      text: 'Ein fester Standort (z. B. Oberhof oder Neuhaus) eignet sich gut für sternförmige Tagesausfahrten.'
-    }
+  const gallery = [
+    { title: 'Morgenlicht am Kamm', tone: 'tone-a' },
+    { title: 'Forstpassage Richtung Oberhof', tone: 'tone-b' },
+    { title: 'Schneller Ostteil bei Neuhaus', tone: 'tone-c' },
+    { title: 'Abendstimmung vor Blankenstein', tone: 'tone-d' }
   ];
 
-  const winterHighlights = [
-    'Rennsteig-Skiwanderweg: rund 140 km (Ascherbrück bei Ruhla bis Brennersgrün bei Lehesten), je nach Schneelage gespurt.',
-    'Thüringer Schneetelefon mit Infos zu Schneehöhen, geöffneten Loipen und Liften: 0800 7236488.',
-    'Zusätzliche Winteraktivitäten: Schneeschuhwandern, Rodeln, Snowtubing und Winterwanderungen.',
-    'Viele Orte bieten saisonale Unterkünfte und Winterpakete für kurze und längere Aufenthalte.'
-  ];
-
-  const infrastructureFacts = [
-    'Auf rennsteig.de werden über 300 Unterkünfte gelistet (u. a. Hotels, Pensionen, Ferienwohnungen, Ferienhäuser, Campingplätze).',
-    'Es gibt eigene Bereiche zu Etappenplanung, Karten, Wetter, Regionen/Orten und Reiseberichten.',
-    'Für die Planung hilfreich: Etappenübersicht mit acht Hauptetappen für die klassische Wanderroute.'
+  const rennsteigPreviewPoints = [
+    { x: 0, y: 0, elevation: 300, label: 'Hörschel' },
+    { x: 18, y: 6, elevation: 520, label: 'Ruhla' },
+    { x: 34, y: 10, elevation: 780, label: 'Inselsberg-Region' },
+    { x: 48, y: 18, elevation: 840, label: 'Oberhof' },
+    { x: 66, y: 23, elevation: 720, label: 'Schmiedefeld' },
+    { x: 82, y: 29, elevation: 760, label: 'Neuhaus' },
+    { x: 100, y: 36, elevation: 500, label: 'Blankenstein' }
   ];
 </script>
 
 <main>
-  <header class="panel rennsteig-panel">
-    <h1>Rennsteig in Thüringen</h1>
-    <p>
-      Ausgebauter Planungsbereich für Touren rund um den Rennsteig mit zusätzlichen Informationen zu
-      Verlauf, Etappen, Anreise, Infrastruktur und Winterbetrieb.
+  <header class="hero">
+    <p class="meta-line">LOCATION THURINGIA, GERMANY</p>
+    <h1>Rennsteig Traverse</h1>
+    <p class="dek">
+      Vom westlichen Kammeinstieg bei Horschel bis nach Blankenstein: Diese Route kombiniert lange
+      Waldlinien, moderate Technik und starke Etappenflexibilitat in einem klassischen Mittelgebirgs-Setup.
     </p>
+    <figure class="hero-art">
+      <img
+        src="/42BD92FD-A239-43C8-809F-06FAD4024551_1_105_c.jpeg"
+        alt="Rennsteig Strecke im Wald"
+        loading="eager"
+      />
+    </figure>
+    <div class="route-stats" aria-label="Routenmetriken">
+      {#each routeStats as metric}
+        <article>
+          <p class="label">{metric.label}</p>
+          <p class="value">{metric.value}</p>
+        </article>
+      {/each}
+    </div>
   </header>
 
-  <section class="panel rennsteig-panel">
-    <h2>Rennsteig-Fakten</h2>
-    <div class="stats-grid">
-      {#each rennsteigFacts as fact}
-        <article class="stat-card stat-card-strong">
-          <p class="stat-label">{fact.label}</p>
-          <p class="stat-value">{fact.value}</p>
-        </article>
-      {/each}
-    </div>
+  <section class="article-grid">
+    <article class="narrative">
+      <h2>Route Difficulty</h2>
+      <p>
+        Der Rennsteig bleibt fahrtechnisch meist kontrollierbar, fordert aber durch Distanz,
+        wechselnde Untergrunde und wiederkehrende Anstiege ein solides Tempo-Management. Wer das
+        Ganze als Overnighter plant, sollte Reserven fur Wetterwechsel und Navigation einbauen.
+      </p>
 
-    <h3>Geeignete Startpunkte</h3>
-    <div class="info-grid">
-      {#each rennsteigStartOptions as option}
-        <article class="info-card info-card-strong">
-          <h4>{option.name}</h4>
-          <p>{option.reason}</p>
-          <p><strong>Logistik:</strong> {option.logistics}</p>
-        </article>
-      {/each}
-    </div>
+      <div class="scale-grid">
+        {#each routeScale as scale}
+          <article class="scale-card">
+            <p class="scale-label">{scale.label}</p>
+            <p class="scale-value">{scale.value}</p>
+            <p class="scale-detail">{scale.detail}</p>
+          </article>
+        {/each}
+      </div>
 
-    <h3>Anreise kompakt</h3>
-    <ul class="guidelines-list">
-      {#each arrivalOptions as option}
-        <li>{option}</li>
-      {/each}
-    </ul>
+      <h2>Highlights</h2>
+      <ul class="text-list">
+        {#each highlights as item}
+          <li>{item}</li>
+        {/each}
+      </ul>
 
-    <h3>Abschnitte mit Charakter</h3>
-    <div class="faq-list">
-      {#each rennsteigEtappen as stage}
-        <article class="faq-item faq-item-strong">
-          <h4>{stage.title}</h4>
-          <p><strong>Profil:</strong> {stage.profile}</p>
-          <p><strong>Tipp:</strong> {stage.hint}</p>
-        </article>
-      {/each}
-    </div>
+      <h2>Must Know</h2>
+      <ul class="text-list">
+        {#each mustKnow as note}
+          <li>{note}</li>
+        {/each}
+      </ul>
 
-    <h3>Saison und Bedingungen</h3>
-    <ul class="guidelines-list">
-      {#each rennsteigSeasonTips as tip}
-        <li>{tip}</li>
-      {/each}
-    </ul>
+      <h2>Trail Notes</h2>
+      <div class="stage-list">
+        {#each stageNotes as stage}
+          <article>
+            <h3>{stage.title}</h3>
+            <p><strong>Profil:</strong> {stage.profile}</p>
+            <p><strong>Tipp:</strong> {stage.hint}</p>
+          </article>
+        {/each}
+      </div>
 
-    <h3>Tourformate</h3>
-    <div class="faq-list">
-      {#each hikingAndBikeFormats as format}
-        <article class="faq-item faq-item-strong">
-          <h4>{format.title}</h4>
-          <p>{format.text}</p>
-        </article>
-      {/each}
-    </div>
+      <h2>Map & GPS</h2>
+      <MapPreview3D title="3D Map Vorschau der Strecke" points={rennsteigPreviewPoints} />
 
-    <h3>Winter am Rennsteig</h3>
-    <ul class="guidelines-list">
-      {#each winterHighlights as winterItem}
-        <li>{winterItem}</li>
-      {/each}
-    </ul>
+      <div class="split-list">
+        <section>
+          <h3>Camping / Unterkunft</h3>
+          <ul class="text-list compact">
+            {#each camping as item}
+              <li>{item}</li>
+            {/each}
+          </ul>
+        </section>
 
-    <h3>Infrastruktur und Planung</h3>
-    <ul class="guidelines-list">
-      {#each infrastructureFacts as infra}
-        <li>{infra}</li>
-      {/each}
-    </ul>
+        <section>
+          <h3>Food / H2O</h3>
+          <ul class="text-list compact">
+            {#each foodAndWater as item}
+              <li>{item}</li>
+            {/each}
+          </ul>
+        </section>
+      </div>
 
-    <h3>Sicherheits-Check vor dem Start</h3>
-    <ul class="guidelines-list">
-      {#each rennsteigSafetyChecklist as check}
-        <li>{check}</li>
-      {/each}
-    </ul>
+      <h3>Resources</h3>
+      <ul class="text-list compact">
+        {#each resources as item}
+          <li>{item}</li>
+        {/each}
+      </ul>
 
-    <p class="source-note">
-      Quellenhinweis: Die zusätzlichen Fakten wurden auf Basis öffentlich verfügbarer Informationen von
-      rennsteig.de (u. a. Bereiche „Anreise“, „Wandern“, „Winter“) zusammengefasst.
-    </p>
+      <h2>Photo Gallery</h2>
+      <div class="gallery-grid">
+        {#each gallery as frame}
+          <figure class={`gallery-frame ${frame.tone}`}>
+            <figcaption>{frame.title}</figcaption>
+          </figure>
+        {/each}
+      </div>
+
+      <p class="terms">
+        Terms of use: Die Route ist eine Planungsgrundlage. Vor der Fahrt aktuelle Bedingungen,
+        Sperrungen und Wetterlage prufen und die Strecke auf eigenes Risiko befahren.
+      </p>
+    </article>
+
+    <aside class="sidebar">
+      <section class="contributor-card">
+        <p class="card-kicker">CONTRIBUTED BY</p>
+        <h3>{contributor.name}</h3>
+        <p class="role">{contributor.role}</p>
+        <p>{contributor.bio}</p>
+      </section>
+
+      <section class="quick-card">
+        <h3>Startpunkte</h3>
+        {#each startPoints as option}
+          <article class="quick-item">
+            <h4>{option.name}</h4>
+            <p>{option.reason}</p>
+            <p><strong>Logistik:</strong> {option.logistics}</p>
+          </article>
+        {/each}
+      </section>
+
+      <section class="quick-card">
+        <h3>Quick Actions</h3>
+        <a class="ghost-btn" href="/checkin">Check-in starten</a>
+        <a class="ghost-btn" href="/mitglieder">Mitglieder LiveTracking</a>
+        <a class="ghost-btn" href="/guide">Route Guide</a>
+      </section>
+    </aside>
   </section>
 </main>
 
 <style>
-  main {
-    max-width: 64rem;
-    margin: 0 auto;
-    padding: 0.5rem 1rem 1.5rem;
-    display: grid;
-    gap: 1rem;
-  }
-
-  .panel {
-    border-radius: 0.75rem;
-    padding: 1rem;
-    display: grid;
-    gap: 0.65rem;
-  }
-
-  .rennsteig-panel {
-    border: 1px solid #ceb08b;
+  :global(body) {
     background:
-      linear-gradient(160deg, rgba(248, 238, 224, 0.98), rgba(239, 223, 202, 0.98)),
-      radial-gradient(circle at 10% 10%, rgba(184, 148, 109, 0.16), transparent 36%);
+      radial-gradient(circle at 14% -2%, rgba(161, 190, 138, 0.22), transparent 34%),
+      radial-gradient(circle at 94% 8%, rgba(205, 157, 92, 0.18), transparent 35%),
+      #efe7d7;
+    color: #2f2a21;
+  }
+
+  main {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0.8rem 1rem 2rem;
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .hero {
+    border: 1px solid #beb295;
+    border-radius: 0.85rem;
+    background: rgba(243, 236, 223, 0.88);
+    padding: 1.1rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .meta-line {
+    margin: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.11em;
+    font-weight: 700;
+    color: #6f644f;
   }
 
   h1,
   h2,
   h3,
+  h4,
   p {
     margin: 0;
   }
 
-  .stats-grid {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Fraunces', 'Iowan Old Style', 'Times New Roman', serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  h1 {
+    font-size: clamp(1.7rem, 3.2vw, 2.7rem);
+    line-height: 1;
+  }
+
+  .dek {
+    max-width: 70ch;
+    line-height: 1.45;
+    color: #4c4437;
+  }
+
+  .hero-art {
+    margin: 0;
+    min-height: 13rem;
+    border-radius: 0.7rem;
+    border: 1px solid #bbac8d;
+    overflow: hidden;
+    background: #d8ccb4;
+  }
+
+  .hero-art img {
+    display: block;
+    width: 100%;
+    min-height: 13rem;
+    max-height: 24rem;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .route-stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .route-stats article {
+    border-top: 1px solid #cabf9f;
+    padding-top: 0.5rem;
+  }
+
+  .label {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: #716653;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .value {
+    font-size: 1.03rem;
+    font-weight: 700;
+    color: #29241d;
+  }
+
+  .article-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .narrative,
+  .sidebar {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .narrative {
+    border: 1px solid #c9bb9b;
+    border-radius: 0.85rem;
+    background: rgba(250, 246, 238, 0.88);
+    padding: 1rem;
+  }
+
+  .narrative > p {
+    line-height: 1.55;
+    color: #433c31;
+  }
+
+  .scale-grid {
+    display: grid;
     gap: 0.6rem;
   }
 
-  .stat-card {
-    border: 1px solid #d1b48f;
-    border-radius: 0.65rem;
-    background: rgba(251, 244, 234, 0.95);
-    padding: 0.65rem;
+  .scale-card {
+    border: 1px solid #d0c4a6;
+    border-radius: 0.7rem;
+    padding: 0.7rem;
+    background: rgba(245, 240, 231, 0.92);
     display: grid;
-    gap: 0.3rem;
+    gap: 0.2rem;
   }
 
-  .stat-label {
-    color: #8b6a48;
-    font-size: 0.82rem;
-  }
-
-  .stat-value {
-    font-size: 1.04rem;
+  .scale-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7f715a;
     font-weight: 700;
   }
 
-  .stat-card-strong {
-    border-color: #bc9562;
+  .scale-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2e281f;
   }
 
-  .info-grid {
-    display: grid;
-    gap: 0.6rem;
+  .scale-detail {
+    font-size: 0.84rem;
+    color: #5c5344;
   }
 
-  .info-card {
-    border: 1px solid #d1b48f;
-    border-radius: 0.65rem;
-    background: rgba(249, 241, 229, 0.94);
-    padding: 0.7rem;
+  .text-list {
+    margin: 0;
+    padding-left: 1.2rem;
     display: grid;
+    gap: 0.45rem;
+    color: #4f473a;
+  }
+
+  .compact {
     gap: 0.35rem;
   }
 
-  .info-card h4,
-  .faq-item h4 {
-    margin: 0;
-    font-size: 0.96rem;
-  }
-
-  .info-card-strong {
-    border-color: #bc9562;
-    background: rgba(244, 233, 217, 0.96);
-  }
-
-  .guidelines-list {
-    margin: 0;
-    padding-left: 1.15rem;
-    display: grid;
-    gap: 0.45rem;
-  }
-
-  .faq-list {
+  .stage-list {
     display: grid;
     gap: 0.55rem;
   }
 
-  .faq-item {
-    border: 1px dashed #ccb089;
-    border-radius: 0.65rem;
+  .stage-list article {
+    border-left: 3px solid #ad9366;
+    padding: 0.25rem 0 0.25rem 0.7rem;
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .split-list {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .gallery-grid {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-frame {
+    margin: 0;
+    border-radius: 0.75rem;
+    border: 1px solid #bfae8b;
+    min-height: 8.6rem;
+    display: flex;
+    align-items: end;
     padding: 0.65rem;
-    background: rgba(251, 244, 235, 0.96);
+    position: relative;
+    overflow: hidden;
   }
 
-  .faq-item-strong {
-    border-color: #bc9562;
-    background: rgba(245, 235, 219, 0.96);
+  .gallery-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.06));
   }
 
-  .source-note {
-    margin-top: 0.4rem;
-    font-size: 0.86rem;
+  .gallery-frame figcaption {
+    position: relative;
+    color: #f8f4ea;
+    font-weight: 700;
+    font-size: 0.83rem;
+    z-index: 1;
+  }
+
+  .tone-a {
+    background: linear-gradient(130deg, #728f6f, #3f6144);
+  }
+
+  .tone-b {
+    background: linear-gradient(130deg, #9b835f, #6f5a3d);
+  }
+
+  .tone-c {
+    background: linear-gradient(130deg, #5d7d84, #35545a);
+  }
+
+  .tone-d {
+    background: linear-gradient(130deg, #9b744f, #5f442f);
+  }
+
+  .terms {
+    font-size: 0.8rem;
     line-height: 1.45;
-    color: #7c6243;
+    color: #706551;
+    border-top: 1px solid #d2c7ac;
+    padding-top: 0.8rem;
+  }
+
+  .sidebar {
+    align-content: start;
+  }
+
+  .contributor-card,
+  .quick-card {
+    border: 1px solid #cabd9f;
+    border-radius: 0.8rem;
+    background: rgba(247, 241, 230, 0.92);
+    padding: 0.85rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .card-kicker {
+    font-size: 0.69rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #756952;
+  }
+
+  .role {
+    color: #645945;
+    font-weight: 700;
+    font-size: 0.82rem;
+  }
+
+  .quick-item {
+    border-top: 1px dashed #d2c4a5;
+    padding-top: 0.5rem;
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .ghost-btn {
+    text-decoration: none;
+    color: #2f281f;
+    border: 1px solid #b9a47c;
+    border-radius: 999px;
+    padding: 0.42rem 0.68rem;
+    width: fit-content;
+    background: rgba(240, 230, 211, 0.85);
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+
+  .ghost-btn:hover {
+    background: #b27f45;
+    color: #fff8ed;
+    border-color: transparent;
   }
 
   @media (min-width: 760px) {
-    .stats-grid {
+    .route-stats {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
-    .info-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .scale-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .split-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 980px) {
+    .article-grid {
+      grid-template-columns: minmax(0, 2fr) minmax(17rem, 1fr);
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 5.4rem;
     }
   }
 </style>
