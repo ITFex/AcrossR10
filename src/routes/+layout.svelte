@@ -17,10 +17,12 @@
 </svelte:head>
 
 <div class="layout-shell">
+	<div class="mist mist-left" aria-hidden="true"></div>
+	<div class="mist mist-right" aria-hidden="true"></div>
 	<header class="topbar">
 		<div class="brand">
-			<p class="brand-name">AcrossR10</p>
-			<p class="brand-sub">Route · Check-in · Planung</p>
+			<p class="brand-name">AcrossR10 Expedition</p>
+			<p class="brand-sub">Rennsteig Sessions · Team Tracking · Saisonpunkte</p>
 		</div>
 		<nav aria-label="Hauptnavigation" class="main-nav">
 			{#each navItems as item}
@@ -29,22 +31,71 @@
 		</nav>
 	</header>
 
-	<slot />
+	<div class="content-frame">
+		<slot />
+	</div>
 </div>
 
 <style>
+	:global(body) {
+		margin: 0;
+		font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+		color: #2f241b;
+		background: #e9dfd1;
+	}
+
+	:global(h1, h2, h3) {
+		font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+		letter-spacing: 0.01em;
+	}
+
 	.layout-shell {
+		position: relative;
 		min-height: 100vh;
+		overflow: hidden;
 		background:
-			radial-gradient(circle at 0% 0%, rgba(205, 177, 140, 0.2), transparent 40%),
-			radial-gradient(circle at 100% 20%, rgba(176, 142, 102, 0.18), transparent 42%),
-			#f3e7d5;
+			radial-gradient(circle at 8% -2%, rgba(130, 96, 62, 0.24), transparent 32%),
+			radial-gradient(circle at 95% 2%, rgba(86, 111, 85, 0.18), transparent 34%),
+			linear-gradient(170deg, #ece3d6 0%, #e3d6c4 48%, #d9c6ae 100%);
+	}
+
+	.layout-shell::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0.16;
+		background-image:
+			linear-gradient(rgba(58, 43, 29, 0.2) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(58, 43, 29, 0.2) 1px, transparent 1px);
+		background-size: 34px 34px;
+	}
+
+	.mist {
+		position: absolute;
+		width: clamp(18rem, 40vw, 32rem);
+		height: clamp(18rem, 40vw, 32rem);
+		border-radius: 50%;
+		pointer-events: none;
+		filter: blur(5px);
+	}
+
+	.mist-left {
+		top: -7rem;
+		left: -9rem;
+		background: radial-gradient(circle, rgba(255, 242, 223, 0.48), transparent 70%);
+	}
+
+	.mist-right {
+		top: -6rem;
+		right: -10rem;
+		background: radial-gradient(circle, rgba(180, 132, 79, 0.25), transparent 72%);
 	}
 
 	.topbar {
 		max-width: 64rem;
 		margin: 0 auto;
-		padding: 1rem 1rem 0.7rem;
+		padding: 1rem 1rem 0.9rem;
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-between;
@@ -52,9 +103,10 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		background: linear-gradient(180deg, rgba(244, 232, 214, 0.96), rgba(244, 232, 214, 0.84));
-		backdrop-filter: blur(7px);
-		border-bottom: 1px solid #d8c2a2;
+		background: linear-gradient(180deg, rgba(240, 229, 211, 0.88), rgba(240, 229, 211, 0.66));
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid rgba(95, 72, 46, 0.26);
+		box-shadow: 0 12px 30px rgba(76, 56, 37, 0.15);
 	}
 
 	.brand {
@@ -68,14 +120,17 @@
 	}
 
 	.brand-name {
-		color: #4f3a25;
-		font-size: 1.18rem;
+		color: #443120;
+		font-size: clamp(1.18rem, 1.5vw, 1.42rem);
 		font-weight: 700;
+		line-height: 1;
 	}
 
 	.brand-sub {
-		color: #7c6243;
-		font-size: 0.82rem;
+		color: #70553a;
+		font-size: 0.79rem;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
 	}
 
 	.main-nav {
@@ -85,25 +140,42 @@
 	}
 
 	.main-nav a {
-		color: #6e5437;
+		color: #5f4730;
 		text-decoration: none;
 		font-weight: 600;
 		font-size: 0.9rem;
-		padding: 0.42rem 0.72rem;
+		padding: 0.46rem 0.78rem;
 		border-radius: 999px;
-		border: 1px solid #ccb18a;
-		background: rgba(247, 237, 223, 0.86);
-		transition: 120ms ease-in-out;
+		border: 1px solid rgba(122, 94, 60, 0.34);
+		background: linear-gradient(180deg, rgba(255, 248, 237, 0.82), rgba(239, 224, 202, 0.8));
+		transition: transform 140ms ease, border-color 140ms ease, color 140ms ease;
 	}
 
 	.main-nav a:hover {
-		border-color: #b8824a;
-		color: #4f3a25;
+		border-color: #9f6f3d;
+		color: #3f2e1f;
+		transform: translateY(-1px);
 	}
 
 	.main-nav a.active {
-		background: linear-gradient(135deg, #b8824a, #9f6f3d);
+		background: linear-gradient(140deg, #a8753f, #82552d);
 		border-color: transparent;
-		color: #fff9ef;
+		color: #fff6ea;
+		box-shadow: 0 9px 16px rgba(95, 60, 28, 0.28);
+	}
+
+	.content-frame {
+		position: relative;
+		z-index: 2;
+	}
+
+	@media (max-width: 760px) {
+		.topbar {
+			padding-bottom: 0.75rem;
+		}
+
+		.brand-sub {
+			display: none;
+		}
 	}
 </style>
