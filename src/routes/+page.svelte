@@ -5,7 +5,7 @@
     de: {
       heroTitle: 'Dein digitales Basislager für den Rennsteig',
       heroText:
-        'Starte deine Session, verfolge Teambewegungen und nutze die aktualisierte Übersicht zum 195 km langen Rennsteig-Radwanderweg für Orientierung und Tourplanung.',
+        'Starte deine Session, verfolge Teambewegungen und entdecke die ~48 km Burg Elgersburg – Gasthaus Mönchhof Runde ab Schmiedefeld am Rennsteig mit GPX-Karte und Check-in-Punkten.',
       startSession: 'Session starten',
       openLeaderboard: 'Bestenliste öffnen',
       cards: {
@@ -29,8 +29,8 @@
         },
         route: {
           kicker: 'Strecke',
-          title: 'Rennsteig-Radweg',
-          text: '195 km von Hörschel bis Blankenstein mit Kurzübersicht, Streckencharakter und offiziellen Planungslinks.',
+          title: 'Burg Elgersburg – Mönchhof Runde',
+          text: '~48 km Rundtour ab Schmiedefeld am Rennsteig mit ~790 Hm, Streckenprofil und GPX-Karte.',
           link: 'Route ansehen'
         }
       }
@@ -38,7 +38,7 @@
     en: {
       heroTitle: 'Your digital base camp for Rennsteig',
       heroText:
-        'Start your session, track team movements and use the updated overview of the 195 km Rennsteig cycle route for navigation and planning.',
+        'Start your session, track team movements and explore the ~48 km Burg Elgersburg – Gasthaus Mönchhof loop from Schmiedefeld am Rennsteig.',
       startSession: 'Start session',
       openLeaderboard: 'Open leaderboard',
       cards: {
@@ -62,8 +62,8 @@
         },
         route: {
           kicker: 'Route',
-          title: 'Rennsteig Cycle Route',
-          text: '195 km from Hörschel to Blankenstein with route summary, profile and official planning links.',
+          title: 'Burg Elgersburg – Mönchhof Loop',
+          text: '~48 km loop from Schmiedefeld am Rennsteig with ~790 m climbing, route profile and GPX map.',
           link: 'View route'
         }
       }
