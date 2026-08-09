@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+import { messages } from '$lib/i18n/index.js';
 
 const initialState = {
   status: 'idle',
@@ -8,33 +9,21 @@ const initialState = {
   error: null
 };
 
-const defaultMessages = {
-  permissionDenied: 'Location access denied.',
-  unavailable: 'Location is currently unavailable.',
-  timeout: 'Location request timed out.',
-  unknown: 'Unknown geolocation error.',
-  unsupported: 'Geolocation is not supported on this device.'
-};
-
 const state = writable(initialState);
 let watchId = null;
-let messages = { ...defaultMessages };
 
 const geolocationErrorMessage = (error) => {
+  const geo = get(messages).geo;
   switch (error?.code) {
     case 1:
-      return messages.permissionDenied;
+      return geo.permissionDenied;
     case 2:
-      return messages.unavailable;
+      return geo.unavailable;
     case 3:
-      return messages.timeout;
+      return geo.timeout;
     default:
-      return messages.unknown;
+      return geo.unknown;
   }
-};
-
-const setMessages = (overrides = {}) => {
-  messages = { ...defaultMessages, ...overrides };
 };
 
 const start = (options = {}) => {
@@ -44,7 +33,7 @@ const start = (options = {}) => {
     state.set({
       ...initialState,
       status: 'error',
-      error: messages.unsupported
+      error: get(messages).geo.unsupported
     });
     return;
   }
@@ -99,8 +88,7 @@ const location = {
   subscribe: state.subscribe,
   start,
   stop,
-  reset,
-  setMessages
+  reset
 };
 
 export default location;

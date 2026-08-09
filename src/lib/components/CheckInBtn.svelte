@@ -5,9 +5,9 @@
   export let userLocation = null;
   export let pois = [];
   export let threshold = 50;
-  export let activeLabel = 'Check in now';
-  export let inactiveLabel = 'Check-in unavailable';
-  export let formatDistanceLabel = (distance) => `Still ${Math.round(distance)}m away`;
+  export let activeLabel = '\u2014';
+  export let inactiveLabel = '\u2014';
+  export let formatDistanceLabel = (distance) => `${Math.round(distance)}m`;
 
   const dispatch = createEventDispatcher();
 
