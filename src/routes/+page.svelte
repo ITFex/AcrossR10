@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import CheckInBtn from '$lib/components/CheckInBtn.svelte';
   import location from '$lib/stores/location';
+  import { messages } from '$lib/i18n/index.js';
   import { haversineDistanceMeters } from '$lib/utils/haversine';
 
   const pois = [
@@ -53,54 +54,55 @@
 
 <main>
   <header>
-    <h1>AcrossR10</h1>
-    <p>Mobile Geofencing Check-in für Radfahrer</p>
+    <h1>{$messages.app.title}</h1>
+    <p>{$messages.app.subtitle}</p>
   </header>
 
   <section class="panel">
-    <h2>Standort</h2>
+    <h2>{$messages.location.heading}</h2>
     {#if $location.error}
       <p class="error">{$location.error}</p>
     {:else if userCoords}
-      <p>Lat: {userCoords.latitude.toFixed(5)}</p>
-      <p>Lon: {userCoords.longitude.toFixed(5)}</p>
-      <p>Genauigkeit: {Math.round($location.accuracy ?? 0)}m</p>
+      <p>{$messages.location.lat}: {userCoords.latitude.toFixed(5)}</p>
+      <p>{$messages.location.lon}: {userCoords.longitude.toFixed(5)}</p>
+      <p>{$messages.location.accuracy}: {Math.round($location.accuracy ?? 0)}m</p>
     {:else}
-      <p>Warte auf GPS-Signal…</p>
+      <p>{$messages.location.waiting}</p>
     {/if}
   </section>
 
   <section class="panel">
-    <h2>Nächster POI</h2>
+    <h2>{$messages.poi.heading}</h2>
     {#if nearest}
       <p>{nearest.poi.name}</p>
-      <p>{Math.round(nearest.distance)}m entfernt</p>
+      <p>{$messages.poi.distance(nearest.distance)}</p>
     {:else}
-      <p>Kein POI verfügbar.</p>
+      <p>{$messages.poi.none}</p>
     {/if}
   </section>
 
   <section class="panel">
-    <h2>Check-in</h2>
+    <h2>{$messages.checkin.heading}</h2>
     <CheckInBtn
       userLocation={userCoords}
       {pois}
-      activeLabel="Jetzt einchecken"
-      inactiveLabel="Check-in nicht verfügbar"
-      formatDistanceLabel={(distance) => `Noch ${Math.round(distance)}m entfernt`}
+      activeLabel={$messages.checkin.active}
+      inactiveLabel={$messages.checkin.inactive}
+      formatDistanceLabel={$messages.checkin.distanceHint}
       on:checkin={handleCheckIn}
     />
 
     {#if checkedInPoi}
       <p class="success">
-        Eingecheckt bei {checkedInPoi.name}
-        {#if checkedInAt}
-          um {checkedInAt.toLocaleTimeString()}
-        {/if}
+        {$messages.checkin.success(
+          checkedInPoi.name,
+          checkedInAt?.toLocaleTimeString() ?? ''
+        )}
       </p>
     {/if}
   </section>
 </main>
+
 
 <style>
   :global(body) {
