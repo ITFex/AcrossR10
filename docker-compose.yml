@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    container_name: acrossr10
+    restart: unless-stopped
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+    ports:
+      - "3000:3000"
