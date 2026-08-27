@@ -35,8 +35,7 @@ const en = {
   },
   auth: {
     login: 'Sign in',
-    logout: 'Sign out',
-    register: 'Register'
+    logout: 'Sign out'
   }
 };
 

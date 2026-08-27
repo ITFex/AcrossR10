@@ -35,8 +35,7 @@ const de = {
   },
   auth: {
     login: 'Anmelden',
-    logout: 'Abmelden',
-    register: 'Registrieren'
+    logout: 'Abmelden'
   }
 };
 

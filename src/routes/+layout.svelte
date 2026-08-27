@@ -6,6 +6,7 @@
 
 	/** @type {import('./$types').LayoutData} */
 	export let data;
+	let session = null;
 
 	$: if (browser) document.documentElement.lang = $locale;
 
