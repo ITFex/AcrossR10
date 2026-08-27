@@ -32,6 +32,10 @@ const de = {
   },
   lang: {
     switchTo: 'English'
+  },
+  auth: {
+    login: 'Anmelden',
+    logout: 'Abmelden'
   }
 };
 
