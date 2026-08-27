@@ -42,15 +42,23 @@ services:
     restart: unless-stopped
     environment:
       - HOST=0.0.0.0
-      - PORT=3000
+      - PORT=3001
       - AUTH_SECRET=${AUTH_SECRET}
       - KEYCLOAK_ID=${KEYCLOAK_ID}
       - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
       - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER}
     ports:
-      - "3000:3000"
+      - "3001:3001"
     depends_on:
       - keycloak
+    networks:
+      - default
+      - bikeracer
+
+networks:
+  bikeracer:
+    external: true
+    name: bikeracer_bikeracer-network
 
 volumes:
   postgres_data:

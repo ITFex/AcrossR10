@@ -11,7 +11,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
 
 ENV HOST=0.0.0.0
 ENV PORT=3000

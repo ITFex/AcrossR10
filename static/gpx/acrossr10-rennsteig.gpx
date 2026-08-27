@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AcrossR10" xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>AcrossR10 – Rennsteig Gravel Querung</name>
+    <desc>Gravelroute über den Rennsteig von Hörschel (Eisenach) bis Blankenstein. Ca. 170 km, 3.200 Hm.</desc>
+    <author><name>AcrossR10</name></author>
+    <copyright author="AcrossR10"><year>2026</year></copyright>
+    <link href="https://wideride.de/acrossr10"><text>AcrossR10</text></link>
+    <time>2026-01-01T00:00:00Z</time>
+    <keywords>Rennsteig, Gravel, Thüringen, Thüringer Wald</keywords>
+    <bounds minlat="50.3498" minlon="10.3951" maxlat="50.9773" maxlon="11.6889"/>
+  </metadata>
+  <trk>
+    <name>AcrossR10 Rennsteig</name>
+    <desc>Gravelroute entlang des Rennsteigs</desc>
+    <trkseg>
+      <!-- Hörschel (Start) -->
+      <trkpt lat="50.9773" lon="10.3951"><ele>230</ele></trkpt>
+      <trkpt lat="50.9620" lon="10.4220"><ele>310</ele></trkpt>
+      <trkpt lat="50.9490" lon="10.4510"><ele>420</ele></trkpt>
+      <!-- Rennsteigkuppe Wartburgkreis -->
+      <trkpt lat="50.9310" lon="10.4850"><ele>530</ele></trkpt>
+      <trkpt lat="50.9180" lon="10.5170"><ele>610</ele></trkpt>
+      <trkpt lat="50.9050" lon="10.5430"><ele>690</ele></trkpt>
+      <!-- Rennsteig-Höhe um Eisenach -->
+      <trkpt lat="50.8920" lon="10.5780"><ele>760</ele></trkpt>
+      <trkpt lat="50.8780" lon="10.6050"><ele>820</ele></trkpt>
+      <trkpt lat="50.8640" lon="10.6340"><ele>870</ele></trkpt>
+      <!-- Großer Inselsberg Umgehung -->
+      <trkpt lat="50.8510" lon="10.6620"><ele>900</ele></trkpt>
+      <trkpt lat="50.8380" lon="10.6910"><ele>870</ele></trkpt>
+      <trkpt lat="50.8230" lon="10.7230"><ele>840</ele></trkpt>
+      <!-- Ruhlaer Sattel -->
+      <trkpt lat="50.8100" lon="10.7530"><ele>780</ele></trkpt>
+      <trkpt lat="50.7950" lon="10.7890"><ele>750</ele></trkpt>
+      <trkpt lat="50.7820" lon="10.8220"><ele>820</ele></trkpt>
+      <!-- Oberhof Bereich -->
+      <trkpt lat="50.7060" lon="10.7340"><ele>910</ele></trkpt>
+      <trkpt lat="50.6910" lon="10.7580"><ele>930</ele></trkpt>
+      <trkpt lat="50.6760" lon="10.7820"><ele>880</ele></trkpt>
+      <!-- Schwarzatal -->
+      <trkpt lat="50.6600" lon="10.8090"><ele>820</ele></trkpt>
+      <trkpt lat="50.6440" lon="10.8370"><ele>790</ele></trkpt>
+      <trkpt lat="50.6290" lon="10.8640"><ele>810</ele></trkpt>
+      <!-- Masserberg -->
+      <trkpt lat="50.6110" lon="10.8920"><ele>850</ele></trkpt>
+      <trkpt lat="50.5950" lon="10.9220"><ele>870</ele></trkpt>
+      <trkpt lat="50.5800" lon="10.9520"><ele>840</ele></trkpt>
+      <!-- Neustadt am Rennsteig -->
+      <trkpt lat="50.5640" lon="10.9830"><ele>810</ele></trkpt>
+      <trkpt lat="50.5490" lon="11.0150"><ele>790</ele></trkpt>
+      <trkpt lat="50.5330" lon="11.0460"><ele>760</ele></trkpt>
+      <!-- Rennsteigbaude -->
+      <trkpt lat="50.5180" lon="11.0780"><ele>780</ele></trkpt>
+      <trkpt lat="50.5020" lon="11.1090"><ele>800</ele></trkpt>
+      <trkpt lat="50.4870" lon="11.1410"><ele>810</ele></trkpt>
+      <!-- Frankenwald -->
+      <trkpt lat="50.4710" lon="11.1720"><ele>790</ele></trkpt>
+      <trkpt lat="50.4550" lon="11.2040"><ele>770</ele></trkpt>
+      <trkpt lat="50.4390" lon="11.2360"><ele>750</ele></trkpt>
+      <!-- Loquitz Übergang -->
+      <trkpt lat="50.4230" lon="11.2670"><ele>720</ele></trkpt>
+      <trkpt lat="50.4070" lon="11.3000"><ele>700</ele></trkpt>
+      <trkpt lat="50.3920" lon="11.3320"><ele>680</ele></trkpt>
+      <!-- Blankenstein (Ziel) -->
+      <trkpt lat="50.3760" lon="11.3640"><ele>650</ele></trkpt>
+      <trkpt lat="50.3620" lon="11.3980"><ele>620</ele></trkpt>
+      <trkpt lat="50.3498" lon="11.4270"><ele>580</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
