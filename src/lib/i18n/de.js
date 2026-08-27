@@ -2,7 +2,7 @@
 const de = {
   app: {
     title: 'AcrossR10',
-    subtitle: 'Mobile Geofencing Check-in für Radfahrer'
+    subtitle: 'Mobile Geofencing-Check-ins entlang des Across R10 im Thüringer Wald'
   },
   location: {
     heading: 'Standort',

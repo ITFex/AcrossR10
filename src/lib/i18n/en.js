@@ -2,7 +2,7 @@
 const en = {
   app: {
     title: 'AcrossR10',
-    subtitle: 'Mobile geofencing check-in for cyclists'
+    subtitle: 'Mobile geofencing check-ins along the Across R10 route in the Thuringian Forest'
   },
   location: {
     heading: 'Location',
