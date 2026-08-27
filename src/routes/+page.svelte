@@ -6,9 +6,16 @@
   import { haversineDistanceMeters } from '$lib/utils/haversine';
 
   const pois = [
-    { id: 1, name: 'Rastplatz Nord', latitude: 52.5208, longitude: 13.4095 },
-    { id: 2, name: 'Fahrradstation Süd', latitude: 52.5173, longitude: 13.3928 },
-    { id: 3, name: 'Aussichtspunkt West', latitude: 52.5124, longitude: 13.3777 }
+    { id: 1, name: 'Hörschel (Start)', latitude: 51.00692, longitude: 10.22831 },
+    { id: 2, name: 'Neuenhof', latitude: 50.99618, longitude: 10.28764 },
+    { id: 3, name: 'Eisenach', latitude: 50.97774, longitude: 10.31952 },
+    { id: 4, name: 'Hohe Sonne', latitude: 50.93179, longitude: 10.35795 },
+    { id: 5, name: 'Etterwinden', latitude: 50.8769, longitude: 10.37449 },
+    { id: 6, name: 'Ascherbrück', latitude: 50.84486, longitude: 10.42432 },
+    { id: 7, name: 'Ruhla', latitude: 50.89233, longitude: 10.36556 },
+    { id: 8, name: 'Großer Inselsberg', latitude: 50.85139, longitude: 10.46389 },
+    { id: 9, name: 'Grenzwiese', latitude: 50.76494, longitude: 10.55807 },
+    { id: 10, name: 'Oberhof', latitude: 50.70647, longitude: 10.72797 }
   ];
 
   let checkedInPoi = null;
