@@ -7,7 +7,6 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			auth: () => Promise<Session | null>;
-			getSession: () => Promise<Session | null>;
 		}
 		interface PageData {
 			session: Session | null;
