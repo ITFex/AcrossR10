@@ -129,11 +129,112 @@ const de = {
     navRegion:  'Region',
     navFaq:     'FAQ',
     navContact: 'Kontakt',
+    navMembers: 'Mein Bereich',
   },
   lang: { switchTo: 'English' },
   auth: {
     login: 'Anmelden',
     logout: 'Abmelden',
+  },
+  members: {
+    greeting: 'Willkommen zurück',
+    pageTitle: 'Mein AcrossR10-Bereich',
+    pageIntro: 'Dein persönlicher Bereich – Querungen dokumentieren, Regeln nachlesen, Verpflegungspunkte planen.',
+    progress: {
+      heading: 'Meine Querungen',
+      intro: 'Trage hier deine absolvierten Querungen ein. Ziel: 10 vollständige Fahrten von Hörschel bis Blankenstein (oder zurück).',
+      crossingLabel: 'Querung',
+      notDone: 'Noch ausstehend',
+      done: 'Absolviert',
+      markDone: 'Eintragen',
+      markUndone: 'Rückgängig',
+      summary: (done, total) => `${done} von ${total} Querungen absolviert`,
+    },
+    catering: {
+      heading: 'Verpflegung unterwegs',
+      intro: 'Auf dem Rennsteigkamm sind Möglichkeiten zur Versorgung rar. Diese Punkte eignen sich als verlässliche Stopps:',
+      points: [
+        {
+          name: 'Hörschel (Start / Ziel)',
+          km: '0 km',
+          icon: '🏁',
+          details: 'Bäckerei, Tankstelle, kleiner Supermarkt. Idealer Ausgangspunkt für Proviant-Auffüllung vor der Tour.',
+        },
+        {
+          name: 'Gasthof Ruhla',
+          km: '~35 km',
+          icon: '🍽️',
+          details: 'Traditionsgasthof im Tal. Warme Küche, Thüringer Bratwurst, Getränke. Empfehlenswert als erster Stopp.',
+        },
+        {
+          name: 'Oberhof – Ortszentrum',
+          km: '~80 km',
+          icon: '🏪',
+          details: 'Supermärkte, Bäckereien, mehrere Restaurants. Größter Versorgungspunkt auf der Strecke. Unbedingt nutzen!',
+        },
+        {
+          name: 'Masserberg / Neustadt a. Rennsteig',
+          km: '~120 km',
+          icon: '🥪',
+          details: 'Kleiner Ort mit Gasthof und Kiosk. Letzte verlässliche Versorgung vor dem langen Endabschnitt nach Blankenstein.',
+        },
+        {
+          name: 'Blankenstein (Ziel / Start)',
+          km: '~170 km',
+          icon: '🏁',
+          details: 'Gasthof und kleines Café direkt am Zielpunkt. Perfekt für die Einkehr nach der Querung.',
+        },
+      ],
+      waterNote: '💧 Trinkwasser-Tipp: Plane mindestens 1,5 l Tragekapazität ein. Bäche auf dem Kamm sind kein zuverlässiger Trinkwasserersatz.',
+    },
+    stvo: {
+      heading: 'StVO & Regeln auf dem Rennsteig',
+      intro: 'Das Radfahren auf Forstwegen unterliegt besonderen Regeln. Hier das Wichtigste im Überblick:',
+      rules: [
+        {
+          icon: '🚧',
+          title: 'Gesperrte Forstwege',
+          body: 'Wege mit dem Schild „Radfahren verboten" oder „Kein Durchgang" dürfen nicht befahren werden. Während Holzeinschlag oder nach Sturm können weitere Wege temporär gesperrt sein – Absperrungen immer respektieren.',
+        },
+        {
+          icon: '🐾',
+          title: 'Wildtiere & Naturschutz',
+          body: 'Der Rennsteig durchquert teils Naturschutzgebiete. Wege nicht verlassen, keinen Lärm machen und Wildtiere nicht aufscheuchen. Hunde an die Leine, besonders in der Brut- und Setzzeit (März–Juli).',
+        },
+        {
+          icon: '🔆',
+          title: 'Beleuchtungspflicht',
+          body: 'Bei Dämmerung und Dunkelheit gilt Beleuchtungspflicht (§ 67 StVZO). Vorderlicht weiß, Rücklicht rot, beides fest montiert. Stirnlampe zählt nicht als Fahrradlicht.',
+        },
+        {
+          icon: '🔔',
+          title: 'Klingel & Überholabstand',
+          body: 'Klingel ist Pflicht (§ 65 StVZO). Beim Überholen von Fußgängern und Wanderern ausreichend Abstand (mind. 1,5 m) halten und ankündigen. Auf engen Forststraßen gilt gegenseitige Rücksichtnahme.',
+        },
+        {
+          icon: '🪖',
+          title: 'Helm & Schutzausrüstung',
+          body: 'Helmpflicht gibt es in Deutschland für Erwachsene nicht, wird aber dringend empfohlen. Auf dem Schotter und in den langen Abfahrten ist ein Helm absolut sinnvoll. Handschuhe und eine gut sitzende Brille schützen zusätzlich.',
+        },
+        {
+          icon: '🚨',
+          title: 'Notruf & Erste Hilfe',
+          body: 'Europäischer Notruf: 112. Im Thüringer Wald kann der Mobilfunkempfang auf dem Kamm lückenhaft sein. Informiere jemanden über deine geplante Route. Erste-Hilfe-Set im Rucksack ist Pflicht.',
+        },
+      ],
+    },
+    tips: {
+      heading: 'Persönliche Tipps & Packliste',
+      intro: 'Unsere Empfehlungen für eine sichere und angenehme Querung:',
+      items: [
+        { icon: '🧰', text: 'Flickzeug, CO₂-Kartuschen oder Pumpe, Kettenöl und Multitool immer dabei.' },
+        { icon: '🧴', text: 'Sonnencreme und Insektenschutz – besonders im Hochsommer auf dem Kamm.' },
+        { icon: '🌧️', text: 'Regenponcho oder Hardshell: Das Wetter auf dem Kamm kann schnell umschlagen.' },
+        { icon: '📱', text: 'Powerbank einpacken – GPS-Nutzung entleert den Akku schneller als gedacht.' },
+        { icon: '💳', text: 'Bargeld mitnehmen: In kleineren Gasthöfen und Kiosken gibt es oft kein Kartenterminal.' },
+        { icon: '🗺️', text: 'Offline-Karte herunterladen (Komoot, OSM). Mobilfunk auf dem Kamm nicht verlässlich.' },
+      ],
+    },
   },
 };
 
