@@ -26,6 +26,7 @@
 		"@auth/core": "^0.41.3",
 		"@auth/sveltekit": "^1.11.3",
 		"@sveltejs/kit": "^2.63.0",
+		"better-sqlite3": "^13.0.3",
 		"svelte": "^5.56.1"
 	}
 }

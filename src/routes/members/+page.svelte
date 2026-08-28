@@ -31,9 +31,56 @@
 		} catch {
 			// ignore storage errors
 		}
+		if (profileSaved) syncToServer();
 	}
 
 	let doneCount = $derived(crossings.filter(Boolean).length);
+
+	// ── Profile ──────────────────────────────────────────────────────────────
+	/** @type {'M' | 'W' | 'D' | ''} */
+	let gender = $state(data.profile?.gender ?? '');
+	let birthYear = $state(data.profile?.birthYear?.toString() ?? '');
+	let isPublic = $state(data.profile?.isPublic ?? true);
+	let profileSaved = $state(!!data.profile);
+	let profileEditing = $state(!data.profile);
+	let profileSaving = $state(false);
+	let profileError = $state('');
+
+	async function saveProfile() {
+		profileError = '';
+		const year = parseInt(birthYear, 10);
+		const currentYear = new Date().getFullYear();
+		if (!gender) { profileError = $messages.members.profile.errorGender; return; }
+		if (!year || year < 1920 || year > currentYear - 10) { profileError = $messages.members.profile.errorYear; return; }
+		profileSaving = true;
+		try {
+			const res = await fetch('/api/profile', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ gender, birthYear: year, crossings: doneCount, isPublic })
+			});
+			if (!res.ok) throw new Error(await res.text());
+			profileSaved = true;
+			profileEditing = false;
+		} catch (e) {
+			profileError = $messages.members.profile.errorSave;
+		} finally {
+			profileSaving = false;
+		}
+	}
+
+	async function syncToServer() {
+		if (!profileSaved) return;
+		try {
+			await fetch('/api/profile', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ gender, birthYear: parseInt(birthYear, 10), crossings: doneCount, isPublic })
+			});
+		} catch {
+			// silent sync failure
+		}
+	}
 </script>
 
 <svelte:head>
@@ -76,6 +123,92 @@
 				</div>
 			{/each}
 		</div>
+	</div>
+</section>
+
+<!-- ═══ BESTENLISTE / PROFIL ═══ -->
+<section class="section" id="profile">
+	<div class="container">
+		<h2>{$messages.members.profile.heading}</h2>
+		<p class="section-intro">{$messages.members.profile.intro}</p>
+
+		{#if doneCount >= TOTAL}
+			<div class="completed-banner">
+				🏆 {$messages.members.profile.completedBanner}
+				<a href="/leaderboard" class="btn-primary banner-btn">{$messages.members.profile.leaderboardLink}</a>
+			</div>
+		{/if}
+
+		{#if profileEditing}
+			<form class="profile-form" onsubmit={(e) => { e.preventDefault(); saveProfile(); }}>
+				<div class="form-row">
+					<label class="form-label">{$messages.members.profile.genderLabel}</label>
+					<div class="gender-btns">
+						{#each ['M', 'W', 'D'] as g}
+							<button
+								type="button"
+								class="gender-btn"
+								class:selected={gender === g}
+								onclick={() => (gender = g)}
+							>
+								{$messages.members.profile.genderOptions[g]}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<div class="form-row">
+					<label class="form-label" for="birth-year">{$messages.members.profile.birthYearLabel}</label>
+					<input
+						id="birth-year"
+						class="form-input"
+						type="number"
+						min="1920"
+						max={new Date().getFullYear() - 10}
+						placeholder="z.B. 1985"
+						bind:value={birthYear}
+					/>
+				</div>
+
+				<div class="form-row form-row-check">
+					<input id="is-public" type="checkbox" bind:checked={isPublic} />
+					<label for="is-public">{$messages.members.profile.publicLabel}</label>
+				</div>
+
+				{#if profileError}
+					<p class="form-error">{profileError}</p>
+				{/if}
+
+				<div class="form-actions">
+					<button class="btn-primary" type="submit" disabled={profileSaving}>
+						{profileSaving ? $messages.members.profile.saving : $messages.members.profile.save}
+					</button>
+					{#if profileSaved}
+						<button type="button" class="btn-ghost-sm" onclick={() => (profileEditing = false)}>
+							{$messages.members.profile.cancel}
+						</button>
+					{/if}
+				</div>
+			</form>
+		{:else}
+			<div class="profile-card">
+				<div class="profile-row">
+					<span class="profile-key">{$messages.members.profile.genderLabel}</span>
+					<span class="profile-val">{$messages.members.profile.genderOptions[gender] ?? gender}</span>
+				</div>
+				<div class="profile-row">
+					<span class="profile-key">{$messages.members.profile.birthYearLabel}</span>
+					<span class="profile-val">{birthYear}</span>
+				</div>
+				<div class="profile-row">
+					<span class="profile-key">{$messages.members.profile.publicLabel}</span>
+					<span class="profile-val">{isPublic ? '✓' : '✗'}</span>
+				</div>
+				<button class="btn-ghost-sm" onclick={() => (profileEditing = true)}>
+					{$messages.members.profile.edit}
+				</button>
+			</div>
+		{/if}
 	</div>
 </section>
 
@@ -192,6 +325,23 @@
 		max-width: 52ch;
 		margin: 0;
 	}
+
+	/* ── buttons ── */
+	.btn-primary {
+		display: inline-block;
+		background: #f97316;
+		color: #0a0f1e;
+		font-weight: 700;
+		font-size: .9rem;
+		padding: .75rem 1.75rem;
+		border-radius: .5rem;
+		text-decoration: none;
+		border: none;
+		cursor: pointer;
+		transition: background 150ms ease, transform 100ms ease;
+	}
+	.btn-primary:hover { background: #fb923c; transform: translateY(-1px); }
+	.btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
 	/* ── progress ── */
 	h2 {
@@ -357,6 +507,85 @@
 		line-height: 1.6;
 	}
 	.tip-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+	/* ── profile ── */
+	.completed-banner {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+		background: rgba(249,115,22,.1);
+		border: 1px solid rgba(249,115,22,.35);
+		border-radius: .75rem;
+		padding: 1rem 1.25rem;
+		color: #fed7aa;
+		font-weight: 700;
+		margin-bottom: 1.5rem;
+	}
+	.banner-btn { font-size: .8rem; padding: .4rem 1rem; }
+	.profile-form {
+		background: #1e293b;
+		border: 1px solid #334155;
+		border-radius: 1rem;
+		padding: 1.5rem;
+		max-width: 36rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+	.form-row { display: flex; flex-direction: column; gap: .4rem; }
+	.form-row-check { flex-direction: row; align-items: center; gap: .6rem; }
+	.form-label { font-size: .8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .07em; }
+	.form-input {
+		background: #0f172a;
+		border: 1px solid #334155;
+		border-radius: .5rem;
+		color: #f1f5f9;
+		font-size: .95rem;
+		padding: .5rem .75rem;
+		width: 10rem;
+	}
+	.form-input:focus { outline: 2px solid #f97316; border-color: transparent; }
+	.gender-btns { display: flex; gap: .5rem; }
+	.gender-btn {
+		background: #0f172a;
+		border: 1px solid #334155;
+		border-radius: .5rem;
+		color: #94a3b8;
+		font-size: .9rem;
+		font-weight: 700;
+		padding: .4rem 1rem;
+		cursor: pointer;
+		transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+	}
+	.gender-btn.selected { background: #f97316; border-color: #f97316; color: #0a0f1e; }
+	.form-error { color: #f87171; font-size: .85rem; margin: 0; }
+	.form-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+	.btn-ghost-sm {
+		background: none;
+		border: 1px solid #334155;
+		border-radius: .375rem;
+		color: #64748b;
+		font-size: .8rem;
+		font-weight: 600;
+		padding: .35rem .875rem;
+		cursor: pointer;
+		transition: color 120ms ease, border-color 120ms ease;
+	}
+	.btn-ghost-sm:hover { color: #94a3b8; border-color: #64748b; }
+	.profile-card {
+		background: #1e293b;
+		border: 1px solid #334155;
+		border-radius: 1rem;
+		padding: 1.25rem 1.5rem;
+		max-width: 36rem;
+		display: flex;
+		flex-direction: column;
+		gap: .75rem;
+	}
+	.profile-row { display: flex; gap: 1rem; align-items: baseline; }
+	.profile-key { font-size: .75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .07em; min-width: 8rem; }
+	.profile-val { color: #f1f5f9; font-weight: 600; }
 
 	/* ── footer ── */
 	footer {

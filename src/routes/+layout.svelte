@@ -19,8 +19,7 @@
 		{ href: '#region',  labelKey: 'navRegion' },
 		{ href: '#faq',     labelKey: 'navFaq' },
 		{ href: '#contact', labelKey: 'navContact' },
-	];
-</script>
+	];</script>
 
 <svelte:head>
 	<title>AcrossR10 – 10× über den Rennsteig</title>
@@ -37,6 +36,7 @@
 		{#if session?.user}
 			<a href="{base}/members" class="nav-members">{$messages.nav.navMembers}</a>
 		{/if}
+		<a href="{base}/leaderboard" class="nav-leaderboard">{$messages.nav.navLeaderboard}</a>
 	</nav>
 	<div class="auth-bar">
 		{#if session?.user}
@@ -103,6 +103,7 @@
 	}
 	.nav-links a:hover { color: #f1f5f9; }
 	.nav-links .nav-members { color: #f97316; }
+	.nav-links .nav-leaderboard { color: #fbbf24; }
 	.auth-bar {
 		display: flex;
 		align-items: center;

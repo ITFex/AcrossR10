@@ -52,6 +52,9 @@ services:
       - KEYCLOAK_ID=${KEYCLOAK_ID}
       - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
       - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER}
+      - DATA_PATH=/data
+    volumes:
+      - app_data:/data
     ports:
       - "3001:3001"
     depends_on:
@@ -67,3 +70,4 @@ networks:
 
 volumes:
   postgres_data:
+  app_data:
