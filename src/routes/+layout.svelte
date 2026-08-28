@@ -47,9 +47,14 @@
 			<button class="auth-btn" on:click={() => signOut()}>{$messages.auth.logout}</button>
 		{:else}
 			<button class="auth-btn" on:click={() => signIn('keycloak')}>{$messages.auth.login}</button>
-			{#if registrationUrl}
-				<a href={registrationUrl} class="auth-btn register-btn">{$messages.auth.register}</a>
-			{/if}
+			<!--
+				Registration goes through the same Auth.js sign-in flow as login
+				(state/PKCE cookies are set there), just with kc_action=REGISTRATION
+				so Keycloak opens the registration form directly.
+			-->
+			<button class="auth-btn register-btn" on:click={() => signIn('keycloak', undefined, { kc_action: 'REGISTRATION' })}>
+				{$messages.auth.register}
+			</button>
 		{/if}
 	</div>
 	<button class="lang-btn" on:click={() => setLocale($locale === 'de' ? 'en' : 'de')}>
