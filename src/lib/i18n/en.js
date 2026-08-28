@@ -129,11 +129,112 @@ const en = {
     navRegion:  'Region',
     navFaq:     'FAQ',
     navContact: 'Contact',
+    navMembers: 'My Area',
   },
   lang: { switchTo: 'Deutsch' },
   auth: {
     login: 'Sign in',
     logout: 'Sign out',
+  },
+  members: {
+    greeting: 'Welcome back',
+    pageTitle: 'My AcrossR10 Area',
+    pageIntro: 'Your personal space – log crossings, read the rules, plan your resupply stops.',
+    progress: {
+      heading: 'My Crossings',
+      intro: 'Track your completed crossings here. Goal: 10 full rides from Hörschel to Blankenstein (or back).',
+      crossingLabel: 'Crossing',
+      notDone: 'Pending',
+      done: 'Completed',
+      markDone: 'Log it',
+      markUndone: 'Undo',
+      summary: (done, total) => `${done} of ${total} crossings completed`,
+    },
+    catering: {
+      heading: 'Resupply on the Route',
+      intro: 'Resupply options on the Rennsteig ridge are scarce. These stops are reliable:',
+      points: [
+        {
+          name: 'Hörschel (Start / Finish)',
+          km: '0 km',
+          icon: '🏁',
+          details: 'Bakery, petrol station, small supermarket. Ideal starting point to stock up before the ride.',
+        },
+        {
+          name: 'Gasthof Ruhla',
+          km: '~35 km',
+          icon: '🍽️',
+          details: 'Traditional inn in the valley. Hot food, Thuringian bratwurst, drinks. Recommended as a first stop.',
+        },
+        {
+          name: 'Oberhof – town centre',
+          km: '~80 km',
+          icon: '🏪',
+          details: 'Supermarkets, bakeries, several restaurants. The biggest resupply point on the route. Make the most of it!',
+        },
+        {
+          name: 'Masserberg / Neustadt a. Rennsteig',
+          km: '~120 km',
+          icon: '🥪',
+          details: 'Small village with an inn and a kiosk. Last reliable resupply before the long final stretch to Blankenstein.',
+        },
+        {
+          name: 'Blankenstein (Finish / Start)',
+          km: '~170 km',
+          icon: '🏁',
+          details: 'Inn and small café right at the finish. Perfect for a post-crossing meal.',
+        },
+      ],
+      waterNote: '💧 Water tip: plan for at least 1.5 l carrying capacity. Streams on the ridge are not a reliable drinking water source.',
+    },
+    stvo: {
+      heading: 'Traffic Rules & Regulations',
+      intro: 'Cycling on forest roads is subject to specific rules. Key points at a glance:',
+      rules: [
+        {
+          icon: '🚧',
+          title: 'Closed forest roads',
+          body: 'Paths signed "No cycling" or "No through route" must not be ridden. During logging operations or after storms, additional paths may be temporarily closed – always respect barriers.',
+        },
+        {
+          icon: '🐾',
+          title: 'Wildlife & nature conservation',
+          body: 'Parts of the Rennsteig pass through nature reserves. Stay on the path, keep noise down and don\'t disturb wildlife. Dogs on leads, especially during breeding season (March–July).',
+        },
+        {
+          icon: '🔆',
+          title: 'Lighting requirement',
+          body: 'Front and rear lights are legally required at dusk and in darkness (§ 67 StVZO). Front white, rear red, both fixed. A head torch does not count as a bicycle light.',
+        },
+        {
+          icon: '🔔',
+          title: 'Bell & overtaking distance',
+          body: 'A bell is mandatory (§ 65 StVZO). When overtaking pedestrians or hikers keep sufficient distance (min. 1.5 m) and signal your approach. On narrow forest roads, mutual consideration applies.',
+        },
+        {
+          icon: '🪖',
+          title: 'Helmet & protective gear',
+          body: 'Helmets are not legally required for adults in Germany, but are strongly recommended. On gravel and long descents a helmet makes absolute sense. Gloves and well-fitting glasses provide additional protection.',
+        },
+        {
+          icon: '🚨',
+          title: 'Emergency calls & first aid',
+          body: 'European emergency number: 112. Mobile reception on the Thuringian Forest ridge can be patchy. Tell someone your planned route. A first aid kit in your pack is essential.',
+        },
+      ],
+    },
+    tips: {
+      heading: 'Personal Tips & Packing List',
+      intro: 'Our recommendations for a safe and enjoyable crossing:',
+      items: [
+        { icon: '🧰', text: 'Tyre repair kit, CO₂ cartridges or pump, chain lube and multi-tool – always carry them.' },
+        { icon: '🧴', text: 'Sun cream and insect repellent – especially in high summer on the ridge.' },
+        { icon: '🌧️', text: 'Rain poncho or hardshell: weather on the ridge can change quickly.' },
+        { icon: '📱', text: 'Pack a power bank – GPS use drains the battery faster than you think.' },
+        { icon: '💳', text: 'Carry cash: smaller inns and kiosks often don\'t have card terminals.' },
+        { icon: '🗺️', text: 'Download an offline map (Komoot, OSM). Mobile signal on the ridge is unreliable.' },
+      ],
+    },
   },
 };
 

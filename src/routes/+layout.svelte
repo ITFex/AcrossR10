@@ -34,6 +34,9 @@
 		{#each navLinks as l}
 			<a href="{base}/{l.href}">{$messages.nav[l.labelKey]}</a>
 		{/each}
+		{#if session?.user}
+			<a href="{base}/members" class="nav-members">{$messages.nav.navMembers}</a>
+		{/if}
 	</nav>
 	<div class="auth-bar">
 		{#if session?.user}
@@ -51,6 +54,19 @@
 <slot />
 
 <style>
+	/* ── base ── */
+	:global(*, *::before, *::after) { box-sizing: border-box; }
+	:global(html) { scroll-behavior: smooth; }
+	:global(body) {
+		margin: 0;
+		font-family: Inter, system-ui, sans-serif;
+		background: #0a0f1e;
+		color: #e2e8f0;
+		line-height: 1.65;
+	}
+	:global(a) { color: #f97316; }
+
+	/* ── nav ── */
 	.site-nav {
 		position: sticky;
 		top: 0;
@@ -86,6 +102,7 @@
 		transition: color 120ms ease;
 	}
 	.nav-links a:hover { color: #f1f5f9; }
+	.nav-links .nav-members { color: #f97316; }
 	.auth-bar {
 		display: flex;
 		align-items: center;
