@@ -13,7 +13,12 @@
 	$effect(() => {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
-			if (stored) crossings = JSON.parse(stored);
+			if (stored) {
+				const parsed = JSON.parse(stored);
+				if (Array.isArray(parsed) && parsed.length === TOTAL) {
+					crossings = parsed.map(Boolean);
+				}
+			}
 		} catch {
 			// ignore parse errors
 		}
@@ -36,7 +41,7 @@
 </svelte:head>
 
 <!-- ═══ HERO ═══ -->
-<section class="members-hero">
+<section class="members-hero" id="top">
 	<div class="container">
 		<p class="eyebrow">{$messages.members.greeting}, {data.session.user.name ?? data.session.user.email} 👋</p>
 		<h1>{$messages.members.pageTitle}</h1>
@@ -50,7 +55,12 @@
 		<h2>{$messages.members.progress.heading}</h2>
 		<p class="section-intro">{$messages.members.progress.intro}</p>
 
-		<div class="progress-bar-wrap">
+		<div class="progress-bar-wrap"
+			role="progressbar"
+			aria-valuenow={doneCount}
+			aria-valuemin={0}
+			aria-valuemax={TOTAL}
+			aria-label={$messages.members.progress.heading}>
 			<div class="progress-bar" style="width: {(doneCount / TOTAL) * 100}%"></div>
 		</div>
 		<p class="progress-summary">{$messages.members.progress.summary(doneCount, TOTAL)}</p>
@@ -60,7 +70,7 @@
 				<div class="crossing-card" class:done>
 					<span class="crossing-num">{$messages.members.progress.crossingLabel} {i + 1}</span>
 					<span class="crossing-status">{done ? $messages.members.progress.done : $messages.members.progress.notDone}</span>
-					<button class="crossing-btn" class:btn-undo={done} onclick={() => toggle(i)}>
+					<button class="crossing-btn" class:btn-undo={done} type="button" aria-pressed={done} onclick={() => toggle(i)}>
 						{done ? $messages.members.progress.markUndone : $messages.members.progress.markDone}
 					</button>
 				</div>
@@ -133,7 +143,7 @@
 
 <footer>
 	<p>{$messages.footer.copy}</p>
-	<p class="footer-links"><a href="#progress">{$messages.footer.toTop}</a></p>
+	<p class="footer-links"><a href="#top">{$messages.footer.toTop}</a></p>
 </footer>
 
 <style>

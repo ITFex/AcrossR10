@@ -194,7 +194,7 @@ const de = {
         {
           icon: '🚧',
           title: 'Gesperrte Forstwege',
-          body: 'Wege mit dem Schild „Radfahren verboten" oder „Kein Durchgang" dürfen nicht befahren werden. Während Holzeinschlag oder nach Sturm können weitere Wege temporär gesperrt sein – Absperrungen immer respektieren.',
+          body: 'Wege mit dem Schild „Radfahren verboten“ oder „Kein Durchgang“ dürfen nicht befahren werden. Während Holzeinschlag oder nach Sturm können weitere Wege temporär gesperrt sein – Absperrungen immer respektieren.',
         },
         {
           icon: '🐾',

@@ -54,6 +54,19 @@
 <slot />
 
 <style>
+	/* ── base ── */
+	:global(*, *::before, *::after) { box-sizing: border-box; }
+	:global(html) { scroll-behavior: smooth; }
+	:global(body) {
+		margin: 0;
+		font-family: Inter, system-ui, sans-serif;
+		background: #0a0f1e;
+		color: #e2e8f0;
+		line-height: 1.65;
+	}
+	:global(a) { color: #f97316; }
+
+	/* ── nav ── */
 	.site-nav {
 		position: sticky;
 		top: 0;
