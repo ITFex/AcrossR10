@@ -2,36 +2,12 @@
 	import { messages } from '$lib/i18n/index.js';
 
 	/** @type {import('./$types').PageData} */
-	let { data } = $props();
+	let { data, form } = $props();
 
-	const TOTAL = 10;
-	const STORAGE_KEY = 'acrossr10_crossings';
-
-	/** @type {boolean[]} */
-	let crossings = $state(Array(TOTAL).fill(false));
-
-	$effect(() => {
-		try {
-			const stored = localStorage.getItem(STORAGE_KEY);
-			if (stored) {
-				const parsed = JSON.parse(stored);
-				if (Array.isArray(parsed) && parsed.length === TOTAL) {
-					crossings = parsed.map(Boolean);
-				}
-			}
-		} catch {
-			// ignore parse errors
-		}
-	});
-
-	function toggle(i) {
-		crossings = crossings.map((v, idx) => (idx === i ? !v : v));
-		try {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(crossings));
-		} catch {
-			// ignore storage errors
-		}
-	}
+	// Server-side state; after an action `form` holds the fresh result.
+	let crossings = $derived(
+		/** @type {boolean[]} */ (form?.crossings ?? data.crossings)
+	);
 
 	let doneCount = $derived(crossings.filter(Boolean).length);
 </script>
@@ -54,28 +30,32 @@
 	<div class="container">
 		<h2>{$messages.members.progress.heading}</h2>
 		<p class="section-intro">{$messages.members.progress.intro}</p>
+		<p class="progress-note">{$messages.members.progress.persistNote}</p>
 
 		<div class="progress-bar-wrap"
 			role="progressbar"
 			aria-valuenow={doneCount}
 			aria-valuemin={0}
-			aria-valuemax={TOTAL}
+			aria-valuemax={data.total}
 			aria-label={$messages.members.progress.heading}>
-			<div class="progress-bar" style="width: {(doneCount / TOTAL) * 100}%"></div>
+			<div class="progress-bar" style="width: {(doneCount / data.total) * 100}%"></div>
 		</div>
-		<p class="progress-summary">{$messages.members.progress.summary(doneCount, TOTAL)}</p>
+		<p class="progress-summary">{$messages.members.progress.summary(doneCount, data.total)}</p>
 
-		<div class="crossings-grid">
-			{#each crossings as done, i}
-				<div class="crossing-card" class:done>
-					<span class="crossing-num">{$messages.members.progress.crossingLabel} {i + 1}</span>
-					<span class="crossing-status">{done ? $messages.members.progress.done : $messages.members.progress.notDone}</span>
-					<button class="crossing-btn" class:btn-undo={done} type="button" aria-pressed={done} onclick={() => toggle(i)}>
-						{done ? $messages.members.progress.markUndone : $messages.members.progress.markDone}
-					</button>
-				</div>
-			{/each}
-		</div>
+		<form method="POST" action="?/toggle" class="crossings-form">
+			<div class="crossings-grid">
+				{#each crossings as done, i}
+					<div class="crossing-card" class:done>
+						<span class="crossing-num">{$messages.members.progress.crossingLabel} {i + 1}</span>
+						<span class="crossing-status">{done ? $messages.members.progress.done : $messages.members.progress.notDone}</span>
+						<button class="crossing-btn" class:btn-undo={done} type="submit"
+							name="toggle" value={i + 1 + ':' + (done ? '0' : '1')}>
+							{done ? $messages.members.progress.markUndone : $messages.members.progress.markDone}
+						</button>
+					</div>
+				{/each}
+			</div>
+		</form>
 	</div>
 </section>
 
@@ -158,7 +138,13 @@
 	.section-intro {
 		color: #94a3b8;
 		max-width: 56ch;
-		margin: 0 0 2.5rem;
+		margin: 0 0 1rem;
+	}
+	.progress-note {
+		color: #64748b;
+		font-size: .8rem;
+		font-weight: 600;
+		margin: 0 0 2rem;
 	}
 
 	/* ── hero ── */

@@ -15,6 +15,8 @@ RUN npm ci --omit=dev --ignore-scripts
 
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV DB_PATH=/data/progress.db
+VOLUME /data
 EXPOSE 3000
 
 CMD ["node", "build"]

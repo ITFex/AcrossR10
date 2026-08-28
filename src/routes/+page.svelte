@@ -1,6 +1,13 @@
 <script>
   import { base } from '$app/paths';
   import { messages } from '$lib/i18n/index.js';
+  import {
+    elevLine,
+    elevFill,
+    elevGrid,
+    elevLabels,
+    elevStats,
+  } from '$lib/elevProfile.js';
 
   let openFaq = $state(null);
 
@@ -67,30 +74,34 @@
       <div class="elevation-card">
         <p class="elev-title">{$messages.route.elevTitle}</p>
         <svg viewBox="0 0 500 120" class="elev-svg" aria-hidden="true">
-          <!-- background grid -->
-          <line x1="0" y1="30" x2="500" y2="30" stroke="#1e293b" stroke-width="1"/>
-          <line x1="0" y1="60" x2="500" y2="60" stroke="#1e293b" stroke-width="1"/>
-          <line x1="0" y1="90" x2="500" y2="90" stroke="#1e293b" stroke-width="1"/>
-          <!-- elevation profile filled -->
+          <!-- background grid (300/500/700/900 m) -->
+          {#each Object.entries(elevGrid) as [m, y] (m)}
+            <line x1="0" y1={y} x2="500" y2={y} stroke="#1e293b" stroke-width="1" />
+            <text x="2" y={y - 2} fill="#94a3b8" font-size="8">{m} m</text>
+          {/each}
+          <!-- elevation profile (real GPX track) -->
           <defs>
             <linearGradient id="elev-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#f97316" stop-opacity="0.7"/>
-              <stop offset="100%" stop-color="#f97316" stop-opacity="0.05"/>
+              <stop offset="0%" stop-color="#f97316" stop-opacity="0.7" />
+              <stop offset="100%" stop-color="#f97316" stop-opacity="0.05" />
             </linearGradient>
           </defs>
-          <path d="M0,110 L0,85 C20,80 30,55 60,40 C90,25 110,20 140,22 C170,24 190,45 220,50
-                   C250,55 270,35 300,28 C330,21 350,15 380,18 C410,21 440,45 470,55 L500,60
-                   L500,110 Z" fill="url(#elev-grad)" />
-          <path d="M0,85 C20,80 30,55 60,40 C90,25 110,20 140,22 C170,24 190,45 220,50
-                   C250,55 270,35 300,28 C330,21 350,15 380,18 C410,21 440,45 470,55 L500,60"
-                fill="none" stroke="#f97316" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- labels -->
-          <text x="2" y="108" fill="#64748b" font-size="9">Hörschel</text>
-          <text x="220" y="108" fill="#64748b" font-size="9" text-anchor="middle">Oberhof</text>
-          <text x="494" y="108" fill="#64748b" font-size="9" text-anchor="end">Blankenstein</text>
-          <text x="2" y="11" fill="#94a3b8" font-size="8">900 m</text>
-          <text x="2" y="41" fill="#94a3b8" font-size="8">700 m</text>
-          <text x="2" y="71" fill="#94a3b8" font-size="8">500 m</text>
+          <path d={elevFill} fill="url(#elev-grad)" />
+          <path d={elevLine} fill="none" stroke="#f97316" stroke-width="2" stroke-linejoin="round" />
+          <!-- location labels -->
+          {#each elevLabels as loc (loc.name)}
+            <text
+              x={loc.x}
+              y="108"
+              fill="#64748b"
+              font-size="9"
+              text-anchor={loc.x < 10 ? 'start' : loc.x > 490 ? 'end' : 'middle'}
+            >{loc.name}</text>
+          {/each}
+          <!-- stats -->
+          <text x="500" y="118" fill="#94a3b8" font-size="8" text-anchor="end"
+            >{elevStats.totalKm} km · {elevStats.minEle}–{elevStats.maxEle} m</text
+          >
         </svg>
         <div class="segment-list">
           {#each $messages.route.segments as seg}

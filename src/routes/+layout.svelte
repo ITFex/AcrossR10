@@ -8,10 +8,12 @@
 	/** @type {import('./$types').LayoutData} */
 	export let data;
 	let session = null;
+	let registrationUrl = null;
 
 	$: if (browser) document.documentElement.lang = $locale;
 
 	$: session = data?.session ?? null;
+	$: registrationUrl = data?.registrationUrl ?? null;
 
 	const navLinks = [
 		{ href: '#event',   labelKey: 'navEvent' },
@@ -34,6 +36,7 @@
 		{#each navLinks as l}
 			<a href="{base}/{l.href}">{$messages.nav[l.labelKey]}</a>
 		{/each}
+		<a href="{base}/leaderboard" class="nav-leaderboard">{$messages.nav.navLeaderboard}</a>
 		{#if session?.user}
 			<a href="{base}/members" class="nav-members">{$messages.nav.navMembers}</a>
 		{/if}
@@ -44,6 +47,9 @@
 			<button class="auth-btn" on:click={() => signOut()}>{$messages.auth.logout}</button>
 		{:else}
 			<button class="auth-btn" on:click={() => signIn('keycloak')}>{$messages.auth.login}</button>
+			{#if registrationUrl}
+				<a href={registrationUrl} class="auth-btn register-btn">{$messages.auth.register}</a>
+			{/if}
 		{/if}
 	</div>
 	<button class="lang-btn" on:click={() => setLocale($locale === 'de' ? 'en' : 'de')}>
@@ -102,6 +108,8 @@
 		transition: color 120ms ease;
 	}
 	.nav-links a:hover { color: #f1f5f9; }
+	.nav-links .nav-leaderboard { color: #94a3b8; }
+	.nav-links .nav-leaderboard:hover { color: #f97316; }
 	.nav-links .nav-members { color: #f97316; }
 	.auth-bar {
 		display: flex;
@@ -128,6 +136,14 @@
 	}
 	.auth-btn:hover,
 	.lang-btn:hover { color: #f8fafc; border-color: #64748b; }
+	.register-btn {
+		border-color: #f97316;
+		color: #f97316;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+	}
+	.register-btn:hover { background: #f97316; color: #0a0f1e; border-color: #f97316; }
 
 	@media (max-width: 640px) {
 		.nav-links { display: none; }
