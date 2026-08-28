@@ -9,6 +9,9 @@
     elevStats,
   } from '$lib/elevProfile.js';
 
+  /** @type {import('./$types').PageData} */
+  let { data } = $props();
+
   let openFaq = $state(null);
 
   function toggleFaq(i) {
@@ -34,6 +37,30 @@
         </div>
       {/each}
     </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ BESTENLISTE-TEASER -->
+<section class="section" id="leaderboard">
+  <div class="container narrow">
+    <h2>{$messages.leaderboardTeaser.heading}</h2>
+    <p class="section-intro center">{$messages.leaderboardTeaser.intro}</p>
+    {#if data.leaderboardTop.length === 0}
+      <p class="lb-teaser-empty">{$messages.leaderboardTeaser.empty}</p>
+    {:else}
+      <div class="lb-teaser-top">
+        {#each data.leaderboardTop as rider, i}
+          <div class="lb-teaser-card" class:champion={rider.done >= 10}>
+            <span class="lb-teaser-rank">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
+            <div class="lb-teaser-body">
+              <span class="lb-teaser-name">{rider.name}</span>
+              <span class="lb-teaser-count">{rider.done}/10</span>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+    <a href="{base}/leaderboard" class="btn-primary lb-teaser-cta">{$messages.leaderboardTeaser.cta}</a>
   </div>
 </section>
 
@@ -186,6 +213,51 @@
     max-width: 56ch;
     margin: 0 0 2.5rem;
   }
+  .section-intro.center { margin-inline: auto; }
+  #leaderboard { text-align: center; }
+
+  /* ── leaderboard teaser ── */
+  .lb-teaser-empty {
+    color: #64748b;
+    font-size: .95rem;
+    margin: 0 auto 2rem;
+    max-width: 40ch;
+  }
+  .lb-teaser-top {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .lb-teaser-card {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: .75rem;
+    padding: .9rem 1.25rem;
+    min-width: 12rem;
+  }
+  .lb-teaser-card.champion { border-color: #f97316; }
+  .lb-teaser-rank { font-size: 1.5rem; }
+  .lb-teaser-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lb-teaser-name {
+    color: #f1f5f9;
+    font-weight: 700;
+    font-size: .95rem;
+  }
+  .lb-teaser-count {
+    color: #f97316;
+    font-weight: 800;
+    font-size: .85rem;
+  }
+  .lb-teaser-cta { margin-top: 0; }
 
   /* ── hero ── */
   .hero {

@@ -1,5 +1,5 @@
 <script>
-	import { messages } from '$lib/i18n/index.js';
+	import { locale, messages } from '$lib/i18n/index.js';
 
 	/** @type {import('./$types').PageData} */
 	let { data, form } = $props();
@@ -8,8 +8,22 @@
 	let crossings = $derived(
 		/** @type {boolean[]} */ (form?.crossings ?? data.crossings)
 	);
-
 	let doneCount = $derived(crossings.filter(Boolean).length);
+	let myPlan = $derived(form?.myPlan ?? data.myPlan);
+	let todaysRiders = $derived(/** @type {any[]} */ (form?.todaysRiders ?? data.todaysRiders));
+	let upcoming = $derived(/** @type {any[]} */ (form?.upcoming ?? data.upcoming));
+
+	/** @param {string} iso YYYY-MM-DD */
+	const prettyDate = (iso) => {
+		const d = new Date(iso + 'T00:00:00');
+		if (Number.isNaN(d.getTime())) return iso;
+		return d.toLocaleDateString($locale === 'de' ? 'de-DE' : 'en-GB', {
+			weekday: 'short',
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+		});
+	};
 </script>
 
 <svelte:head>
@@ -59,8 +73,92 @@
 	</div>
 </section>
 
+<!-- ═══ TOUR-PLANUNG ═══ -->
+<section class="section section-dark" id="tourplan">
+	<div class="container">
+		<h2>{$messages.members.tourplan.heading}</h2>
+		<p class="section-intro">{$messages.members.tourplan.intro}</p>
+
+		<!-- Heute am Start -->
+		<div class="today-card">
+			<h3 class="today-heading">🚴 {$messages.members.tourplan.todayHeading}</h3>
+			{#if todaysRiders.length === 0}
+				<p class="today-zero">{$messages.members.tourplan.todayZero}</p>
+			{:else}
+				<p class="today-count">{$messages.members.tourplan.todayCount(todaysRiders.length)}</p>
+				<ul class="today-names">
+					{#each todaysRiders as r}
+						<li>
+							{r.name}
+							<span class="dir-badge">{r.direction === 'return' ? $messages.members.tourplan.dirBadgeReturn : $messages.members.tourplan.dirBadgeForward}</span>
+							<span class="today-done">{r.done}/{data.total}</span>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</div>
+
+		<!-- Meine Planung -->
+		<div class="plan-card">
+			<h3>{$messages.members.tourplan.myPlanHeading}</h3>
+			{#if myPlan.date}
+				<p class="my-plan-summary">{$messages.members.tourplan.myPlanSummary(prettyDate(myPlan.date), myPlan.direction)}</p>
+			{:else}
+				<p class="no-plan">{$messages.members.tourplan.noPlan}</p>
+			{/if}
+
+			<form method="POST" action="?/plan" class="plan-form">
+				<div class="plan-field">
+					<label for="plan-date">{$messages.members.tourplan.dateLabel}</label>
+					<input id="plan-date" type="date" name="date" value={myPlan.date ?? ''} required />
+					<p class="field-hint">{$messages.members.tourplan.dateHint}</p>
+				</div>
+				<div class="plan-field">
+					<label for="plan-direction">{$messages.members.tourplan.directionLabel}</label>
+					<select id="plan-direction" name="direction">
+						<option value="forward">{$messages.members.tourplan.directionForward}</option>
+						<option value="return">{$messages.members.tourplan.directionReturn}</option>
+					</select>
+				</div>
+				<div class="plan-actions">
+					<button type="submit" class="plan-save">{$messages.members.tourplan.save}</button>
+					{#if myPlan.date}
+						<button type="submit" name="clear" value="1" class="plan-clear">{$messages.members.tourplan.clear}</button>
+					{/if}
+				</div>
+			</form>
+		</div>
+
+		<!-- Community-Pläne der nächsten 7 Tage -->
+		<h3 class="upcoming-heading">📅 {$messages.members.tourplan.upcomingHeading}</h3>
+		{#if upcoming.length === 0}
+			<p class="upcoming-empty">{$messages.members.tourplan.upcomingEmpty}</p>
+		{:else}
+			<div class="upcoming-list">
+				{#each upcoming as day}
+					<div class="upcoming-day">
+						<div class="upcoming-day-head">
+							<span class="upcoming-date">{prettyDate(day.date)}</span>
+							<span class="upcoming-count">{$messages.members.tourplan.upcomingCount(day.riders.length, prettyDate(day.date))}</span>
+						</div>
+						<ul class="upcoming-riders">
+							{#each day.riders as r}
+								<li>
+									{r.name}
+									<span class="dir-badge">{r.direction === 'return' ? $messages.members.tourplan.dirBadgeReturn : $messages.members.tourplan.dirBadgeForward}</span>
+									<span class="today-done">{r.done}/{data.total}</span>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
+</section>
+
 <!-- ═══ VERPFLEGUNG ═══ -->
-<section class="section section-dark" id="catering">
+<section class="section" id="catering">
 	<div class="container">
 		<h2>{$messages.members.catering.heading}</h2>
 		<p class="section-intro">{$messages.members.catering.intro}</p>
@@ -85,7 +183,7 @@
 </section>
 
 <!-- ═══ STVO ═══ -->
-<section class="section" id="stvo">
+<section class="section section-dark" id="stvo">
 	<div class="container">
 		<h2>{$messages.members.stvo.heading}</h2>
 		<p class="section-intro">{$messages.members.stvo.intro}</p>
@@ -105,7 +203,7 @@
 </section>
 
 <!-- ═══ TIPPS ═══ -->
-<section class="section section-dark" id="tips">
+<section class="section" id="tips">
 	<div class="container">
 		<h2>{$messages.members.tips.heading}</h2>
 		<p class="section-intro">{$messages.members.tips.intro}</p>
@@ -258,6 +356,200 @@
 	.crossing-btn:hover { color: #f8fafc; border-color: #64748b; }
 	.crossing-btn.btn-undo { border-color: #f97316; color: #f97316; }
 	.crossing-btn.btn-undo:hover { background: rgba(249,115,22,.1); }
+
+	/* ── tour plan ── */
+	.today-card {
+		background: rgba(249,115,22,.07);
+		border: 1px solid rgba(249,115,22,.35);
+		border-radius: 1rem;
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+	.today-heading {
+		font-size: 1.05rem;
+		color: #f97316;
+		margin: 0 0 .75rem;
+	}
+	.today-zero { color: #94a3b8; margin: 0; font-size: .95rem; }
+	.today-count {
+		color: #f1f5f9;
+		font-weight: 800;
+		font-size: 1.1rem;
+		margin: 0 0 .75rem;
+	}
+	.today-names {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: .5rem 1.5rem;
+	}
+	.today-names li {
+		color: #cbd5e1;
+		font-weight: 600;
+		font-size: .9rem;
+		display: flex;
+		align-items: center;
+		gap: .4rem;
+	}
+	.dir-badge {
+		display: inline-block;
+		background: #1e293b;
+		border: 1px solid #334155;
+		border-radius: .25rem;
+		padding: 0 .35rem;
+		font-size: .75rem;
+		color: #94a3b8;
+		line-height: 1.4;
+	}
+	.today-done {
+		font-size: .75rem;
+		color: #64748b;
+		font-weight: 700;
+	}
+
+	.plan-card {
+		background: #1e293b;
+		border: 1px solid #334155;
+		border-radius: 1rem;
+		padding: 1.5rem;
+		margin-bottom: 2.5rem;
+	}
+	.my-plan-summary {
+		color: #f97316;
+		font-weight: 700;
+		margin: 0 0 1rem;
+	}
+	.no-plan {
+		color: #64748b;
+		margin: 0 0 1rem;
+		font-size: .9rem;
+	}
+	.plan-form {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25rem 2rem;
+		align-items: flex-start;
+	}
+	.plan-field {
+		display: flex;
+		flex-direction: column;
+		gap: .4rem;
+	}
+	.plan-field label {
+		font-size: .75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .07em;
+		color: #64748b;
+	}
+	.plan-field input[type='date'],
+	.plan-field select {
+		background: #0f172a;
+		border: 1px solid #334155;
+		border-radius: .375rem;
+		color: #e2e8f0;
+		padding: .5rem .75rem;
+		font-size: .9rem;
+		font-family: inherit;
+	}
+	.plan-field input[type='date'] { color-scheme: dark; }
+	.plan-field input:focus,
+	.plan-field select:focus {
+		outline: none;
+		border-color: #f97316;
+	}
+	.field-hint {
+		font-size: .75rem;
+		color: #475569;
+		margin: 0;
+	}
+	.plan-actions {
+		display: flex;
+		gap: .75rem;
+		padding-top: 1.4rem;
+	}
+	.plan-save {
+		background: #f97316;
+		color: #0a0f1e;
+		font-weight: 700;
+		font-size: .85rem;
+		border: none;
+		border-radius: .375rem;
+		padding: .5rem 1.25rem;
+		cursor: pointer;
+		transition: background 120ms ease;
+	}
+	.plan-save:hover { background: #fb923c; }
+	.plan-clear {
+		background: transparent;
+		border: 1px solid #334155;
+		border-radius: .375rem;
+		color: #94a3b8;
+		font-size: .85rem;
+		font-weight: 600;
+		padding: .5rem 1.25rem;
+		cursor: pointer;
+		transition: color 120ms ease, border-color 120ms ease;
+	}
+	.plan-clear:hover { color: #f8fafc; border-color: #64748b; }
+
+	.upcoming-heading {
+		font-size: 1.05rem;
+		margin: 0 0 1rem;
+		color: #f1f5f9;
+	}
+	.upcoming-empty {
+		color: #64748b;
+		margin: 0;
+		font-size: .9rem;
+	}
+	.upcoming-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem;
+	}
+	.upcoming-day {
+		background: #1e293b;
+		border: 1px solid #334155;
+		border-radius: .75rem;
+		padding: 1rem 1.25rem;
+	}
+	.upcoming-day-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: .5rem;
+		margin-bottom: .6rem;
+	}
+	.upcoming-date {
+		font-weight: 800;
+		color: #f1f5f9;
+		font-size: .9rem;
+	}
+	.upcoming-count {
+		font-size: .72rem;
+		color: #f97316;
+		font-weight: 700;
+	}
+	.upcoming-riders {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: .3rem;
+	}
+	.upcoming-riders li {
+		color: #cbd5e1;
+		font-size: .85rem;
+		font-weight: 600;
+		display: flex;
+		align-items: center;
+		gap: .4rem;
+	}
 
 	/* ── catering ── */
 	.catering-list {

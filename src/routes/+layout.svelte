@@ -6,14 +6,11 @@
 	import { base } from '$app/paths';
 
 	/** @type {import('./$types').LayoutData} */
-	export let data;
-	let session = null;
-	let registrationUrl = null;
+	let { data } = $props();
 
-	$: if (browser) document.documentElement.lang = $locale;
-
-	$: session = data?.session ?? null;
-	$: registrationUrl = data?.registrationUrl ?? null;
+	let menuOpen = $state(false);
+	let session = $derived(/** @type {any} */ (data?.session ?? null));
+	let registrationUrl = $derived(data?.registrationUrl ?? null);
 
 	const navLinks = [
 		{ href: '#event',   labelKey: 'navEvent' },
@@ -22,6 +19,16 @@
 		{ href: '#faq',     labelKey: 'navFaq' },
 		{ href: '#contact', labelKey: 'navContact' },
 	];
+
+	/** @param {MouseEvent} e */
+	function toggleMenu(e) {
+		e.preventDefault();
+		menuOpen = !menuOpen;
+	}
+
+	function closeMenu() {
+		menuOpen = false;
+	}
 </script>
 
 <svelte:head>
@@ -32,33 +39,36 @@
 
 <header class="site-nav">
 	<a class="nav-brand" href="{base}/#top">AcrossR10</a>
-	<nav class="nav-links">
+	<nav class="nav-links" class:open={menuOpen}>
 		{#each navLinks as l}
-			<a href="{base}/{l.href}">{$messages.nav[l.labelKey]}</a>
+			<a href="{base}/{l.href}" onclick={closeMenu}>{$messages.nav[l.labelKey]}</a>
 		{/each}
-		<a href="{base}/leaderboard" class="nav-leaderboard">{$messages.nav.navLeaderboard}</a>
+		<a href="{base}/leaderboard" class="nav-leaderboard" onclick={closeMenu}>{$messages.nav.navLeaderboard}</a>
 		{#if session?.user}
-			<a href="{base}/members" class="nav-members">{$messages.nav.navMembers}</a>
+			<a href="{base}/members" class="nav-members" onclick={closeMenu}>{$messages.nav.navMembers}</a>
 		{/if}
 	</nav>
 	<div class="auth-bar">
 		{#if session?.user}
 			<span class="user-name">{session.user.name ?? session.user.email}</span>
-			<button class="auth-btn" on:click={() => signOut()}>{$messages.auth.logout}</button>
+			<button class="auth-btn" onclick={() => signOut()}>{$messages.auth.logout}</button>
 		{:else}
-			<button class="auth-btn" on:click={() => signIn('keycloak')}>{$messages.auth.login}</button>
+			<button class="auth-btn" onclick={() => signIn('keycloak')}>{$messages.auth.login}</button>
 			<!--
 				Registration goes through the same Auth.js sign-in flow as login
 				(state/PKCE cookies are set there), just with kc_action=REGISTRATION
 				so Keycloak opens the registration form directly.
 			-->
-			<button class="auth-btn register-btn" on:click={() => signIn('keycloak', undefined, { kc_action: 'REGISTRATION' })}>
+			<button class="auth-btn register-btn" onclick={() => signIn('keycloak', undefined, { kc_action: 'REGISTRATION' })}>
 				{$messages.auth.register}
 			</button>
 		{/if}
 	</div>
-	<button class="lang-btn" on:click={() => setLocale($locale === 'de' ? 'en' : 'de')}>
+	<button class="lang-btn" onclick={() => setLocale($locale === 'de' ? 'en' : 'de')}>
 		{$messages.lang.switchTo}
+	</button>
+	<button class="nav-toggle" aria-expanded={menuOpen} aria-label={$messages.nav.toggleMenu} onclick={toggleMenu}>
+		<span class="nav-toggle-icon" class:is-open={menuOpen}></span>
 	</button>
 </header>
 
@@ -150,7 +160,58 @@
 	}
 	.register-btn:hover { background: #f97316; color: #0a0f1e; border-color: #f97316; }
 
+	/* ── mobile hamburger ── */
+	.nav-toggle {
+		display: none;
+		background: none;
+		border: 1px solid #334155;
+		border-radius: .375rem;
+		padding: .4rem .5rem;
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+	.nav-toggle-icon,
+	.nav-toggle-icon::before,
+	.nav-toggle-icon::after {
+		display: block;
+		width: 18px;
+		height: 2px;
+		background: #94a3b8;
+		border-radius: 2px;
+		transition: transform 180ms ease, opacity 180ms ease;
+	}
+	.nav-toggle-icon { position: relative; }
+	.nav-toggle-icon::before,
+	.nav-toggle-icon::after {
+		content: '';
+		position: absolute;
+		left: 0;
+	}
+	.nav-toggle-icon::before { top: -6px; }
+	.nav-toggle-icon::after { top: 6px; }
+	.nav-toggle-icon.is-open { background: transparent; }
+	.nav-toggle-icon.is-open::before { transform: translateY(6px) rotate(45deg); }
+	.nav-toggle-icon.is-open::after { transform: translateY(-6px) rotate(-45deg); }
+
 	@media (max-width: 640px) {
-		.nav-links { display: none; }
+		.nav-toggle { display: inline-flex; }
+		.nav-links {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			flex-direction: column;
+			gap: 0;
+			background: rgba(10,15,30,.98);
+			border-bottom: 1px solid #1e293b;
+			padding: .25rem 0;
+			display: none;
+		}
+		.nav-links.open { display: flex; }
+		.nav-links a {
+			padding: .7rem 1.5rem;
+			font-size: .85rem;
+		}
+		.auth-bar .user-name { display: none; }
 	}
 </style>
