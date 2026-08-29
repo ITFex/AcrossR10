@@ -32,8 +32,8 @@
 </script>
 
 <svelte:head>
-	<title>AcrossR10 – 10× über den Rennsteig</title>
-	<meta name="description" content="Gravel-Challenge: den Rennsteig 10-mal mit dem Gravelbike überqueren. GPX-Download, Streckeninfos, FAQ." />
+	<title>{$messages.seo.title}</title>
+	<meta name="description" content={$messages.seo.description} />
 	<link rel="icon" href={favicon} />
 </svelte:head>
 

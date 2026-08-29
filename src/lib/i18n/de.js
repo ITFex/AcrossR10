@@ -64,11 +64,6 @@ const de = {
         body: 'Der letzte große Anstieg führt durch das Schwaleland – schnell von Schnellbach über das Kammerbach- und Zellaer Forst-Terrain bis nach Oberhof. Steile Forststraßen, Fichtenwände und Kammblick weit über die Täler.',
       },
       {
-        icon: '🍺',
-        title: 'Thüringer Küche',
-        body: 'Thüringer Bratwurst, Klöße und Rostbrätel sind Pflicht. In Kleinbrauereien zwischen Hildburghausen und Sonneberg gibt es regionale Biere, die nach einem langen Tag auf dem Rennsteig besonders gut schmecken.',
-      },
-      {
         icon: '📖',
         title: 'Geschichte',
         body: 'Der Rennsteig diente Jahrhunderte als Grenzweg zwischen Thüringen und Franken. Grenzsteine, historische Rastplätze und alte Forstbeschriftungen machen jede Fahrt zu einer Zeitreise.',
@@ -82,7 +77,7 @@ const de = {
   },
   highlights: {
     heading: 'Highlights entlang der Route',
-    intro: 'Inhalte aus dem CMS: Ausflugsziele, Ausrüstungs-Tipps und Insider-Empfehlungen entlang der 130 km – pflegbar ohne Deployment.',
+    intro: 'Ausflugsziele, Ausrüstungs-Tipps und Insider-Empfehlungen entlang der 130 km von Hörschel bis Oberhof.',
     empty: 'Noch keine Highlights hinterlegt.',
   },
   faq: {
@@ -165,6 +160,10 @@ const de = {
     riderLabel: (name, done) => `${name} · ${done}/10`,
   },
   lang: { switchTo: 'English' },
+  seo: {
+    title: 'AcrossR10 – 10× über den Rennsteig',
+    description: 'Gravel-Challenge: den Rennsteig 10-mal mit dem Gravelbike überqueren. GPX-Download, Streckeninfos, FAQ.',
+  },
   auth: {
     login: 'Anmelden',
     logout: 'Abmelden',

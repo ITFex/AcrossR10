@@ -64,11 +64,6 @@ const en = {
         body: 'The final big climb runs through the Schwaleland – quickly from Schnellbach over the Kammerbach and Zellaer Forest terrain up to Oberhof. Steep forest roads, spruce walls and ridge views far over the valleys.',
       },
       {
-        icon: '🍺',
-        title: 'Thuringian Cuisine',
-        body: 'Thuringian bratwurst, dumplings and Rostbrätel are mandatory. Small breweries between Hildburghausen and Sonneberg serve regional beers that taste particularly good after a long day on the Rennsteig.',
-      },
-      {
         icon: '📖',
         title: 'History',
         body: 'The Rennsteig served for centuries as a boundary path between Thuringia and Franconia. Boundary stones, historic rest stops and old forestry markings make every ride a journey through time.',
@@ -82,7 +77,7 @@ const en = {
   },
   highlights: {
     heading: 'Highlights along the route',
-    intro: 'Content from the CMS: excursions, gear tips and insider recommendations along the 130 km – manageable without a deployment.',
+    intro: 'Excursions, gear tips and insider recommendations along the 130 km from Hörschel to Oberhof.',
     empty: 'No highlights yet.',
   },
   faq: {
@@ -165,6 +160,10 @@ const en = {
     riderLabel: (name, done) => `${name} · ${done}/10`,
   },
   lang: { switchTo: 'Deutsch' },
+  seo: {
+    title: 'AcrossR10 – 10× Across the Rennsteig',
+    description: 'Gravel challenge: cross the Rennsteig ten times by gravel bike. GPX download, route info, FAQ.',
+  },
   auth: {
     login: 'Sign in',
     logout: 'Sign out',
