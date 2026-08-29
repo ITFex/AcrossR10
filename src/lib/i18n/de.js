@@ -109,7 +109,7 @@ const de = {
       },
       {
         q: 'Wie dokumentiere ich meine Querungen?',
-        a: 'Mit dem Mitgliederbereich auf dieser Seite: Im Login-Bereich trägst du deine absolvierten Fahrten ein. Der Fortschritt wird serverseitig gespeichert und erscheint in der ewigen Bestenliste.',
+        a: 'Mit dem Mitgliederbereich auf dieser Seite: Im Login-Bereich trägst du deine absolvierten Fahrten ein. Jeder Eintrag wird per GPS-Geofencing verifiziert – du musst dich innerhalb von 100 m am jeweiligen Checkpoint aufhalten. Der Fortschritt wird serverseitig gespeichert und erscheint in der ewigen Bestenliste.',
       },
     ],
   },
@@ -174,6 +174,27 @@ const de = {
       markDone: 'Eintragen',
       markUndone: 'Rückgängig',
       summary: (done, total) => `${done} von ${total} Querungen absolviert`,
+      geofence: {
+        checking: '📍 Ortung läuft…',
+        checkpoints: [
+          'Hörschel (Start)',
+          'Neuenhof / Eisenach',
+          'St. Elisabeth / Eisenach',
+          'Hohe Sonne',
+          'Gerstungen',
+          'Ruhla',
+          'Friedrichroda',
+          'Schnellbach',
+          'Zellaer Forst / Oberhof',
+          'Oberhof Ziel (Rondell)',
+        ],
+        success: (name, dist) => `✅ Checkpoint „${name}" erreicht – nur ${dist} m entfernt. Querung eingetragen!`,
+        deniedBody: (name, km, radius) =>
+          `❌ Check-in abgelehnt: Du bist ${km} km vom Checkpoint „${name}" entfernt. Erlaubt: max. ${radius} m.`,
+        gpsError:
+          '⚠️ Dein Standort konnte nicht ermittelt werden. Bitte die Standortfreigabe im Browser erlauben und es erneut versuchen.',
+        undone: '↩️ Querung rückgängig gemacht.',
+      },
     },
     tourplan: {
       heading: 'Meine Tourplanung',

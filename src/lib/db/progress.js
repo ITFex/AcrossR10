@@ -233,16 +233,16 @@ export function getUpcomingPlans(days = 7) {
 		/** @type {{ plannedDate: string, name: string, direction: string | null, done: number }[]} */ (
 			db
 				.prepare(`
-					SELECT r.planned_date AS plannedDate,
-					       r.name AS name,
-					       r.plan_direction AS direction,
-					       COUNT(c.position) AS done
-					FROM riders r
-					LEFT JOIN crossings c ON c.rider_subject_id = r.subject_id
-					WHERE r.planned_date IS NOT NULL
-					GROUP BY r.subject_id
-					ORDER BY r.planned_date ASC
-				`)
+				SELECT r.planned_date AS plannedDate,
+				       r.name AS name,
+				       r.plan_direction AS direction,
+				       COUNT(c.position) AS done
+				FROM riders r
+				LEFT JOIN crossings c ON c.rider_subject_id = r.subject_id
+				WHERE r.planned_date IS NOT NULL
+				GROUP BY r.subject_id
+				ORDER BY r.planned_date ASC
+			`)
 				.all()
 		);
 
@@ -275,4 +275,126 @@ export function getUpcomingPlans(days = 7) {
 		}
 	}
 	return result;
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// GEOFENCING – 10 Checkpoints, 100 m Radius
+// ═════════════════════════════════════════════════════════════════════════
+
+/** @type {{ position: number, name: string, lat: number, lon: number, radius_m: number }[]} */
+const GEOFENCE_POINTS = [
+	{ position: 1, name: 'Hörschel (Start)', lat: 51.006922, lon: 10.228308, radius_m: 100 },
+	{ position: 2, name: 'Neuenhof / Eisenach', lat: 50.997010, lon: 10.214077, radius_m: 100 },
+	{ position: 3, name: 'St. Elisabeth / Eisenach', lat: 50.976117, lon: 10.320483, radius_m: 100 },
+	{ position: 4, name: 'Hohe Sonne', lat: 50.932015, lon: 10.318970, radius_m: 100 },
+	{ position: 5, name: 'Gerstungen', lat: 50.921473, lon: 10.306867, radius_m: 100 },
+	{ position: 6, name: 'Ruhla', lat: 50.890611, lon: 10.354525, radius_m: 100 },
+	{ position: 7, name: 'Friedrichroda', lat: 50.831053, lon: 10.554117, radius_m: 100 },
+	{ position: 8, name: 'Schnellbach', lat: 50.774293, lon: 10.559983, radius_m: 100 },
+	{ position: 9, name: 'Zellaer Forst / Oberhof', lat: 50.699302, lon: 10.710864, radius_m: 100 },
+	{ position: 10, name: 'Oberhof Ziel (Rondell)', lat: 50.694220, lon: 10.720421, radius_m: 100 },
+];
+
+// Migration: crossing_points + crossing_validations Tabellen
+db.exec(`
+	CREATE TABLE IF NOT EXISTS crossing_points (
+		position    INTEGER PRIMARY KEY CHECK (position BETWEEN 1 AND ${TOTAL_CROSSINGS}),
+		name        TEXT NOT NULL,
+		lat         REAL NOT NULL,
+		lon         REAL NOT NULL,
+		radius_m    INTEGER NOT NULL DEFAULT 100
+	);
+
+	CREATE TABLE IF NOT EXISTS crossing_validations (
+		rider_subject_id TEXT NOT NULL REFERENCES riders(subject_id) ON DELETE CASCADE,
+		position         INTEGER NOT NULL CHECK (position BETWEEN 1 AND ${TOTAL_CROSSINGS}),
+		validated_at     TEXT NOT NULL DEFAULT (datetime('now')),
+		lat              REAL NOT NULL,
+		lon              REAL NOT NULL,
+		distance_m       REAL NOT NULL,
+		PRIMARY KEY (rider_subject_id, position)
+	);
+`);
+
+// Seeding der 10 Checkpoints (einmalig beim Start)
+const seedPoint = db.prepare(`
+	INSERT OR IGNORE INTO crossing_points (position, name, lat, lon, radius_m)
+	VALUES (?, ?, ?, ?, ?)
+`);
+for (const p of GEOFENCE_POINTS) {
+	seedPoint.run(p.position, p.name, p.lat, p.lon, p.radius_m);
+}
+
+/**
+ * Haversine-Distanz in Metern zwischen zwei Lat/Lon-Punkten.
+ * @param {number} lat1
+ * @param {number} lon1
+ * @param {number} lat2
+ * @param {number} lon2
+ * @returns {number} Distanz in Metern
+ */
+function haversineM(lat1, lon1, lat2, lon2) {
+	const R = 6371000; // Erdradius in m
+	const φ1 = lat1 * Math.PI / 180;
+	const φ2 = lat2 * Math.PI / 180;
+	const Δφ = (lat2 - lat1) * Math.PI / 180;
+	const Δλ = (lon2 - lon1) * Math.PI / 180;
+	const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+	return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+/**
+ * Prüft (nur lesend), ob eine User-Position im Radius des Checkpoints liegt.
+ * @param {string} subjectId
+ * @param {number} position 1..10
+ * @param {number} userLat
+ * @param {number} userLon
+ * @returns {{ allowed: boolean, distance_m: number | null, point: {name: string, lat: number, lon: number, radius_m: number} | null, error?: string }}
+ */
+export function checkCrossingGeofence(subjectId, position, userLat, userLon) {
+	const pos = Number(position);
+	if (!Number.isInteger(pos) || pos < 1 || pos > TOTAL_CROSSINGS) {
+		return { allowed: false, distance_m: null, point: null, error: 'invalid_position' };
+	}
+	const point = db.prepare('SELECT * FROM crossing_points WHERE position = ?').get(pos);
+	if (!point) return { allowed: false, distance_m: null, point: null, error: 'invalid_position' };
+
+	const dist = haversineM(userLat, userLon, point.lat, point.lon);
+	return {
+		allowed: dist <= point.radius_m,
+		distance_m: Math.round(dist),
+		point: { name: point.name, lat: point.lat, lon: point.lon, radius_m: point.radius_m },
+	};
+}
+
+/**
+ * Protokoliert die Geofence-Validierung und trägt die Crossing ein.
+ * Wirft RangeError, wenn die Position außerhalb des Radius liegt.
+ * @param {string} subjectId
+ * @param {number} position 1..10
+ * @param {number} userLat
+ * @param {number} userLon
+ * @returns {{ allowed: boolean, distance_m: number, point: {name: string, lat: number, lon: number, radius_m: number} }}
+ */
+export function recordValidatedCrossing(subjectId, position, userLat, userLon) {
+	const check = checkCrossingGeofence(subjectId, position, userLat, userLon);
+	if (!check.allowed) {
+		throw new RangeError(`Außerhalb des Checkpoint-Radius (${check.distance_m} m)`);
+	}
+	ensureRider.run(subjectId);
+	db.prepare(`
+		INSERT OR IGNORE INTO crossing_validations
+			(rider_subject_id, position, lat, lon, distance_m)
+		VALUES (?, ?, ?, ?, ?)
+	`).run(subjectId, position, userLat, userLon, check.distance_m);
+	insertCrossing.run(subjectId, position);
+	return check;
+}
+
+/**
+ * Liefert alle Checkpoint-Definitionen für Client-seitige Anzeige (Karte, Liste).
+ * @returns {{position: number, name: string, lat: number, lon: number, radius_m: number}[]}
+ */
+export function getCrossingPoints() {
+	return GEOFENCE_POINTS.map(p => ({ ...p }));
 }

@@ -109,7 +109,7 @@ const en = {
       },
       {
         q: 'How do I log my crossings?',
-        a: 'With the members area on this page: log your completed rides in the login area. Your progress is stored on the server and appears in the all-time leaderboard.',
+        a: 'With the members area on this page: log your completed rides in the login area. Each entry is verified via GPS geofencing – you must be within 100 m of the respective checkpoint. Your progress is stored on the server and appears in the all-time leaderboard.',
       },
     ],
   },
@@ -174,6 +174,27 @@ const en = {
       markDone: 'Log it',
       markUndone: 'Undo',
       summary: (done, total) => `${done} of ${total} crossings completed`,
+      geofence: {
+        checking: '📍 Getting your location…',
+        checkpoints: [
+          'Hörschel (start)',
+          'Neuenhof / Eisenach',
+          'St. Elisabeth / Eisenach',
+          'Hohe Sonne',
+          'Gerstungen',
+          'Ruhla',
+          'Friedrichroda',
+          'Schnellbach',
+          'Zellaer Forst / Oberhof',
+          'Oberhof finish (Rondell)',
+        ],
+        success: (name, dist) => `✅ Checkpoint "${name}" reached – only ${dist} m away. Crossing logged!`,
+        deniedBody: (name, km, radius) =>
+          `❌ Check-in denied: You are ${km} km from checkpoint "${name}". Allowed: max. ${radius} m.`,
+        gpsError:
+          '⚠️ Your location could not be determined. Please allow location access in your browser and try again.',
+        undone: '↩️ Crossing undone.',
+      },
     },
     tourplan: {
       heading: 'My Tour Plan',

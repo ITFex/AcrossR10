@@ -1,5 +1,6 @@
 <script>
 	import { locale, messages } from '$lib/i18n/index.js';
+	import { base } from '$app/paths';
 
 	/** @type {import('./$types').PageData} */
 	let { data, form } = $props();
@@ -24,6 +25,117 @@
 			year: 'numeric',
 		});
 	};
+
+	// ── GEOFENCING ────────────────────────────────────────────────────────
+	/** Element-Referenzen fürs manuelle Formular-Einreichen */
+	let crossingsForm;
+	let toggleInput;
+	let geoLatInput;
+	let geoLonInput;
+
+	/** Position, deren GPS-Check gerade läuft (1..10), sonst null */
+	let checkingPos = $state(null);
+	/** Einziges Toast: neuestes gewinnt (Client- oder Server-Quelle). */
+	let toast = $state(null); // { type: 'geo_success'|'geo_denied'|'geo_required'|'geo_undone'|'gps_error', geo? }
+	let toastTimer = null;
+
+	function pushToast(t) {
+		toast = t;
+		clearTimeout(toastTimer);
+		toastTimer = setTimeout(() => {
+			if (toast === t) toast = null; // nur, wenn nichts Neues dazwischen kam
+		}, 6000);
+	}
+
+	/** Client-Toast (nach client-seitigem GPS-Check). */
+	function showToast(t) {
+		pushToast(t);
+	}
+
+	/** Toasts aus dem Server-Action-Ergebnis (form-props). Dedupe-Nonce `ts`
+	 * verhindert, dass dasselbe Ergebnis doppelt angezeigt wird. */
+	let lastFormKey = '';
+	$effect(() => {
+		const f = form;
+		let t = null;
+		if (f) {
+			if (f.error === 'geo_denied' || f.error === 'geo_required') {
+				t = { type: f.error, geo: f.geo ?? null };
+			} else if (f.geo?.allowed) {
+				t = { type: 'geo_success', geo: f.geo };
+			} else if (f.geo?.undone) {
+				t = { type: 'geo_undone', geo: f.geo ?? null };
+			}
+		}
+		const key = t
+			? JSON.stringify([t.type, t.geo?.ts, t.geo?.undone, f?.updated, f?.planUpdated])
+			: 'none';
+		if (key !== lastFormKey) {
+			lastFormKey = key;
+			if (t) pushToast(t);
+		}
+	});
+
+	/** Holt aktuelle GPS-Position (Browser Geolocation API). */
+	function getCurrentPosition() {
+		return new Promise((resolve, reject) => {
+			if (!navigator.geolocation) {
+				reject(new Error('Geolocation not supported'));
+				return;
+			}
+			navigator.geolocation.getCurrentPosition(resolve, reject, {
+				enableHighAccuracy: true,
+				timeout: 10000,
+				maximumAge: 0,
+			});
+		});
+	}
+
+	/**
+	 * Eintragen: GPS holen → API-Check → bei Erfolg Formular mit
+	 * geo_lat/geo_lon einreichen (Server erzwingt denselben Check erneut).
+	 * @param {number} position 1..10
+	 */
+	async function geofenceSubmit(position) {
+		if (checkingPos !== null) return;
+		checkingPos = position;
+		try {
+			const pos = await getCurrentPosition();
+			const { latitude, longitude } = pos.coords;
+
+			const res = await fetch(`${base}/api/validate-crossing`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ position, lat: latitude, lon: longitude }),
+			});
+
+			const result = await res.json();
+			if (!result.allowed) {
+				showToast({ type: 'geo_denied', geo: result });
+				return;
+			}
+
+			// Erfolg: versteckte Felder befüllen + normales Formular einreichen
+			if (toggleInput) toggleInput.value = `${position}:1`;
+			if (geoLatInput) geoLatInput.value = String(latitude);
+			if (geoLonInput) geoLonInput.value = String(longitude);
+			crossingsForm?.submit();
+		} catch (err) {
+			console.error(err);
+			showToast({ type: 'gps_error' });
+		} finally {
+			checkingPos = null;
+		}
+	}
+
+	/** Rückgängig: normales Formular ohne GPS einreichen. */
+	function undoSubmit(position) {
+		if (toggleInput) toggleInput.value = `${position}:0`;
+		if (geoLatInput) geoLatInput.value = '';
+		if (geoLonInput) geoLonInput.value = '';
+		crossingsForm?.submit();
+	}
 </script>
 
 <svelte:head>
@@ -56,20 +168,59 @@
 		</div>
 		<p class="progress-summary">{$messages.members.progress.summary(doneCount, data.total)}</p>
 
-		<form method="POST" action="?/toggle" class="crossings-form">
+		<form method="POST" action="?/toggle" class="crossings-form" bind:this={crossingsForm}>
+			<input type="hidden" name="toggle" bind:this={toggleInput} value="" />
+			<input type="hidden" name="geo_lat" bind:this={geoLatInput} value="" />
+			<input type="hidden" name="geo_lon" bind:this={geoLonInput} value="" />
 			<div class="crossings-grid">
 				{#each crossings as done, i}
 					<div class="crossing-card" class:done>
 						<span class="crossing-num">{$messages.members.progress.crossingLabel} {i + 1}</span>
 						<span class="crossing-status">{done ? $messages.members.progress.done : $messages.members.progress.notDone}</span>
-						<button class="crossing-btn" class:btn-undo={done} type="submit"
-							name="toggle" value={i + 1 + ':' + (done ? '0' : '1')}>
-							{done ? $messages.members.progress.markUndone : $messages.members.progress.markDone}
+						<button class="crossing-btn" class:btn-undo={done} type="button"
+							onclick={() => (done ? undoSubmit(i + 1) : geofenceSubmit(i + 1))}
+							disabled={checkingPos !== null}>
+							{checkingPos === i + 1
+								? $messages.members.progress.geofence.checking
+								: done
+									? $messages.members.progress.markUndone
+									: $messages.members.progress.markDone}
 						</button>
+						{#if done}
+							<span class="checkpoint-name">📍 {$messages.members.progress.geofence.checkpoints[i]}</span>
+						{/if}
 					</div>
 				{/each}
 			</div>
 		</form>
+
+		{#if toast}
+			{#if toast.type === 'geo_success'}
+				<div class="geofence-toast success" role="status">
+					{$messages.members.progress.geofence.success(toast.geo?.point?.name ?? '', toast.geo?.distance_m ?? 0)}
+				</div>
+			{:else if toast.type === 'geo_denied'}
+				<div class="geofence-toast fail" role="alert">
+					{$messages.members.progress.geofence.deniedBody(
+						toast.geo?.point?.name ?? $messages.members.progress.crossingLabel,
+						((toast.geo?.distance_m ?? 0) / 1000).toFixed(2),
+						toast.geo?.point?.radius_m ?? 100
+					)}
+				</div>
+			{:else if toast.type === 'geo_required'}
+				<div class="geofence-toast fail" role="alert">
+					{$messages.members.progress.geofence.gpsError}
+				</div>
+			{:else if toast.type === 'gps_error'}
+				<div class="geofence-toast fail" role="alert">
+					{$messages.members.progress.geofence.gpsError}
+				</div>
+			{:else if toast.type === 'geo_undone'}
+				<div class="geofence-toast undo" role="status">
+					{$messages.members.progress.geofence.undone}
+				</div>
+			{/if}
+		{/if}
 	</div>
 </section>
 
@@ -354,8 +505,44 @@
 		text-align: center;
 	}
 	.crossing-btn:hover { color: #f8fafc; border-color: #64748b; }
+	.crossing-btn:disabled { opacity: .55; cursor: wait; }
 	.crossing-btn.btn-undo { border-color: #f97316; color: #f97316; }
 	.crossing-btn.btn-undo:hover { background: rgba(249,115,22,.1); }
+	.checkpoint-name {
+		font-size: .72rem;
+		color: #64748b;
+		font-weight: 600;
+	}
+
+	/* ── geofence toasts ── */
+	.geofence-toast {
+		margin-top: 1.25rem;
+		padding: .85rem 1.1rem;
+		border-radius: .6rem;
+		font-size: .9rem;
+		font-weight: 600;
+		line-height: 1.5;
+		animation: toast-in 180ms ease;
+	}
+	@keyframes toast-in {
+		from { opacity: 0; transform: translateY(-.3rem); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+	.geofence-toast.success {
+		background: rgba(34,197,94,.1);
+		border: 1px solid rgba(34,197,94,.4);
+		color: #86efac;
+	}
+	.geofence-toast.fail {
+		background: rgba(239,68,68,.1);
+		border: 1px solid rgba(239,68,68,.4);
+		color: #fca5a5;
+	}
+	.geofence-toast.undo {
+		background: rgba(148,163,184,.1);
+		border: 1px solid rgba(148,163,184,.35);
+		color: #cbd5e1;
+	}
 
 	/* ── tour plan ── */
 	.today-card {

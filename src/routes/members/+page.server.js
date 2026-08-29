@@ -1,10 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { base } from '$app/paths';
 import {
+	checkCrossingGeofence,
 	getCrossings,
 	getPlan,
 	getPlansForToday,
 	getUpcomingPlans,
+	recordValidatedCrossing,
 	setCrossing,
 	setPlan,
 	syncRider,
@@ -13,6 +15,19 @@ import {
 
 const PLAN_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const PLAN_DIRECTIONS = new Set(['forward', 'return']);
+
+/**
+ * Baut die volle Seiten-Datenstruktur (gleiche Form wie `load`),
+ * damit die UI nach einem Action automatisch aktuell bleibt.
+ * @param {string} subjectId
+ */
+const fullState = (subjectId) => ({
+	crossings: getCrossings(subjectId),
+	total: TOTAL_CROSSINGS,
+	myPlan: getPlan(subjectId),
+	todaysRiders: getPlansForToday(),
+	upcoming: getUpcomingPlans(7),
+});
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ parent }) => {
@@ -24,14 +39,9 @@ export const load = async ({ parent }) => {
 	}
 	const user = session.user;
 	syncRider(user);
-	const crossings = getCrossings(user.id);
 	return {
 		session,
-		crossings,
-		total: TOTAL_CROSSINGS,
-		myPlan: getPlan(user.id),
-		todaysRiders: getPlansForToday(),
-		upcoming: getUpcomingPlans(7),
+		...fullState(user.id),
 	};
 };
 
@@ -39,7 +49,14 @@ export const load = async ({ parent }) => {
 export const actions = {
 	/**
 	 * POST /acrossr10/members?action=toggle
-	 * form: toggle (1..10):'0'|'1'
+	 * form: toggle (1..10):'0'|'1', geo_lat, geo_lon
+	 *
+	 * Geofencing (serverseitig erzwungen):
+	 * - Eintragen (→ '1') verlangt eine GPS-Position innerhalb des
+	 *   100-m-Radius des jeweiligen Checkpoints. Ohne gültige Koordinate
+	 *   oder außerhalb des Radius wird abgelehnt (fail 400).
+	 * - Rückgängig (→ '0') bleibt ohne GPS möglich.
+	 *
 	 * Achtung: In Actions gibt es kein `parent()` – Session via locals.auth().
 	 */
 	toggle: async ({ request, locals }) => {
@@ -47,6 +64,7 @@ export const actions = {
 		if (!session?.user?.id) {
 			throw redirect(303, `${base}/`);
 		}
+		const subjectId = session.user.id;
 
 		const formData = await request.formData();
 		const raw = String(formData.get('toggle') ?? '');
@@ -54,17 +72,64 @@ export const actions = {
 		const position = Number(posStr);
 		const done = stateStr === '1';
 
+		if (!Number.isInteger(position) || position < 1 || position > TOTAL_CROSSINGS) {
+			return fail(400, { error: 'invalid_position' });
+		}
+
+		if (done) {
+			// ── Geofence: GPS-Position muss mitgeschickt werden ──
+			const latRaw = formData.get('geo_lat');
+			const lonRaw = formData.get('geo_lon');
+			const lat = typeof latRaw === 'string' ? Number(latRaw) : NaN;
+			const lon = typeof lonRaw === 'string' ? Number(lonRaw) : NaN;
+
+			if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+				return fail(400, { error: 'geo_required' });
+			}
+
+			// ── Geofence: serverseitig innerhalb des Radius prüfen ──
+			const check = checkCrossingGeofence(subjectId, position, lat, lon);
+			if (!check.allowed) {
+				return fail(400, {
+					error: 'geo_denied',
+					geo: {
+						allowed: false,
+						ts: Date.now(),
+						distance_m: check.distance_m,
+						point: check.point,
+					},
+				});
+			}
+
+			try {
+				recordValidatedCrossing(subjectId, position, lat, lon);
+			} catch {
+				return fail(500, { error: 'db_error' });
+			}
+
+			return {
+				...fullState(subjectId),
+				updated: position,
+				geo: {
+					allowed: true,
+					ts: Date.now(),
+					distance_m: check.distance_m,
+					point: check.point,
+				},
+			};
+		}
+
+		// ── Rückgängig: kein Geofence nötig ──
 		try {
-			setCrossing(session.user.id, position, done);
+			setCrossing(subjectId, position, false);
 		} catch {
 			return fail(400, { error: 'invalid_position' });
 		}
 
 		return {
-			session,
-			crossings: getCrossings(session.user.id),
-			total: TOTAL_CROSSINGS,
+			...fullState(subjectId),
 			updated: position,
+			geo: { allowed: false, undone: true },
 		};
 	},
 
@@ -79,6 +144,7 @@ export const actions = {
 		if (!session?.user?.id) {
 			throw redirect(303, `${base}/`);
 		}
+		const subjectId = session.user.id;
 
 		const formData = await request.formData();
 		const dateRaw = String(formData.get('date') ?? '').trim();
@@ -91,18 +157,13 @@ export const actions = {
 		const date = !clear && PLAN_DATE_RE.test(dateRaw) ? dateRaw : null;
 
 		try {
-			setPlan(session.user.id, date, date ? direction : null);
+			setPlan(subjectId, date, date ? direction : null);
 		} catch {
 			return fail(400, { error: 'invalid_plan' });
 		}
 
 		return {
-			session,
-			crossings: getCrossings(session.user.id),
-			total: TOTAL_CROSSINGS,
-			myPlan: getPlan(session.user.id),
-			todaysRiders: getPlansForToday(),
-			upcoming: getUpcomingPlans(7),
+			...fullState(subjectId),
 			planUpdated: true,
 		};
 	},
