@@ -75,6 +75,16 @@ const de = {
       },
     ],
   },
+  news: {
+    heading: 'News & Updates',
+    intro: 'Aktuelles von der Strecke, der Saison und der AcrossR10-Community.',
+    empty: 'Noch keine News veröffentlicht. Bleib dran – hier erscheint alles Aktive rund um die Tour.',
+  },
+  highlights: {
+    heading: 'Highlights entlang der Route',
+    intro: 'Inhalte aus dem CMS: Ausflugsziele, Ausrüstungs-Tipps und Insider-Empfehlungen entlang der 130 km – pflegbar ohne Deployment.',
+    empty: 'Noch keine Highlights hinterlegt.',
+  },
   faq: {
     heading: 'Häufige Fragen',
     intro: 'Alles, was du vor der ersten Querung wissen solltest.',

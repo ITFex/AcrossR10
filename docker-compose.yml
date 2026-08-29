@@ -53,12 +53,39 @@ services:
       - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
       - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER}
       - DB_PATH=/data/progress.db
+      - CMS_API_URL=http://acrossr10-cms:3000/acrossr10/cms/api
+      - CMS_PUBLIC_URL=https://wideride.de/acrossr10/cms
     volumes:
       - acrossr10_data:/data
     ports:
       - "3001:3001"
     depends_on:
       - keycloak
+      - cms
+    networks:
+      - default
+      - bikeracer
+
+  # ===========================================================================
+  # Payload CMS – Content für AcrossR10 (News, Highlights, Media)
+  # Läuft unter /acrossr10/cms/ (Next.js basePath), admin unter
+  # /acrossr10/cms/admin. DB: eigene Datenbank "cms" im postgres-Container.
+  # Uploads landen im Named Volume acrossr10_cms_media (/media im Container).
+  # ===========================================================================
+  cms:
+    build: ./cms
+    container_name: acrossr10-cms
+    restart: unless-stopped
+    env_file:
+      - ./cms/.env
+    environment:
+      # Container-Name im Docker-Netz (lösbar via Docker-DNS)
+      DATABASE_URL: postgresql://cms:CmsAcrossR10_2026!@acrossr10-postgres:5432/cms
+    volumes:
+      - acrossr10_cms_media:/media
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - default
       - bikeracer
@@ -71,3 +98,4 @@ networks:
 volumes:
   postgres_data:
   acrossr10_data:
+  acrossr10_cms_media:

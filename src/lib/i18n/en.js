@@ -75,6 +75,16 @@ const en = {
       },
     ],
   },
+  news: {
+    heading: 'News & Updates',
+    intro: 'The latest from the route, the season and the AcrossR10 community.',
+    empty: 'No news published yet. Stay tuned – everything current about the tour shows up here.',
+  },
+  highlights: {
+    heading: 'Highlights along the route',
+    intro: 'Content from the CMS: excursions, gear tips and insider recommendations along the 130 km – manageable without a deployment.',
+    empty: 'No highlights yet.',
+  },
   faq: {
     heading: 'Frequently Asked Questions',
     intro: 'Everything you need to know before your first crossing.',

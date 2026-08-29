@@ -1,6 +1,6 @@
 <script>
   import { base } from '$app/paths';
-  import { messages } from '$lib/i18n/index.js';
+  import { locale, messages } from '$lib/i18n/index.js';
   import {
     elevLine,
     elevFill,
@@ -159,6 +159,59 @@
     </div>
   </div>
 </section>
+
+<!-- ═══════════════════════════════════════════ NEWS (CMS) -->
+<section class="section section-dark" id="news">
+  <div class="container">
+    <h2>{$messages.news.heading}</h2>
+    <p class="section-intro">{$messages.news.intro}</p>
+    {#if data.cms.news[$locale].length === 0}
+      <p class="cms-empty">{$messages.news.empty}</p>
+    {:else}
+      <div class="news-grid">
+        {#each data.cms.news[$locale] as item (item.id)}
+          <article class="news-card">
+            {#if item.imageUrl}
+              <img class="news-img" src={item.imageUrl} alt={item.title} loading="lazy" />
+            {/if}
+            <div class="news-body">
+              {#if item.date}
+                <time class="news-date" datetime={item.date}>{item.date.slice(0, 10)}</time>
+              {/if}
+              <h3>{item.title}</h3>
+              {#if item.teaser}
+                <p class="news-teaser">{item.teaser}</p>
+              {/if}
+            </div>
+          </article>
+        {/each}
+      </div>
+    {/if}
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ HIGHLIGHTS (CMS) -->
+{#if data.cms.highlights[$locale].length > 0}
+<section class="section" id="highlights">
+  <div class="container">
+    <h2>{$messages.highlights.heading}</h2>
+    <p class="section-intro">{$messages.highlights.intro}</p>
+    <div class="highlights-grid">
+      {#each data.cms.highlights[$locale] as h (h.id)}
+        <div class="highlight-card">
+          {#if h.imageUrl}
+            <img class="highlight-img" src={h.imageUrl} alt={h.title} loading="lazy" />
+          {/if}
+          <h3>{h.title}</h3>
+          {#if h.text}
+            <p>{h.text}</p>
+          {/if}
+        </div>
+      {/each}
+    </div>
+  </div>
+</section>
+{/if}
 
 <!-- ═══════════════════════════════════════════ FAQ -->
 <section class="section section-dark" id="faq">
@@ -407,6 +460,69 @@
   .region-card:hover { border-color: #f97316; }
   .region-icon { font-size: 2rem; display: block; margin-bottom: .75rem; }
   .region-card p { color: #94a3b8; font-size: .9rem; margin: 0; }
+
+  /* ── news (CMS) ── */
+  .cms-empty {
+    color: #64748b;
+    font-size: .95rem;
+    max-width: 52ch;
+  }
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.25rem;
+  }
+  .news-card {
+    display: flex;
+    flex-direction: column;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: .75rem;
+    overflow: hidden;
+    transition: border-color 150ms ease;
+  }
+  .news-card:hover { border-color: #f97316; }
+  .news-img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
+  .news-body { padding: 1rem 1.25rem 1.25rem; }
+  .news-date {
+    display: block;
+    font-size: .72rem;
+    color: #64748b;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: .35rem;
+  }
+  .news-teaser { color: #94a3b8; font-size: .88rem; margin: .35rem 0 0; line-height: 1.6; }
+
+  /* ── highlights (CMS) ── */
+  .highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1.25rem;
+  }
+  .highlight-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    transition: border-color 150ms ease;
+  }
+  .highlight-card:hover { border-color: #f97316; }
+  .highlight-img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: .5rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  .highlight-card p { color: #94a3b8; font-size: .9rem; margin: 0; }
 
   /* ── faq ── */
   .faq-list { display: flex; flex-direction: column; gap: .75rem; max-width: 60rem; }
