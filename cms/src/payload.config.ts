@@ -29,6 +29,11 @@ export default buildConfig({
   },
   secret: process.env.PAYLOAD_SECRET || '',
   serverURL: process.env.SERVER_URL || 'https://wideride.de/acrossr10/cms',
+  // Payload fügt serverURL automatisch in die CSRF-Allowlist (sanitize.js).
+  // Problem: serverURL trägt den Sub-Pfad, aber Browser senden im Origin-Header
+  // NIE einen Pfad (always `https://wideride.de`). Ohne expliziten Eintrag wird
+  // der payload-Token-Cookie bei jeder Write-Operation abgewiesen → 403 für den Admin.
+  csrf: ['https://wideride.de'],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
