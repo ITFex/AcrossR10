@@ -87,7 +87,7 @@ export function getNews(locale) {
 /**
  * Lädt veröffentlichte Highlights für eine Locale (sortiert nach position).
  * @param {'de' | 'en'} locale
- * @returns {Promise<Array<{id:string, title:string, text:string, imageUrl:string}>>}
+ * @returns {Promise<Array<{id:string, title:string, text:string, imageUrl:string, lat?:number|null, lng?:number|null}>>}
  */
 export function getHighlights(locale) {
 	return cached(`highlights:${locale}`, async () => {
@@ -102,6 +102,8 @@ export function getHighlights(locale) {
 				title: d.title || '',
 				text: d.text || '',
 				imageUrl: mediaUrl(d.image),
+				lat: typeof d.lat === 'number' ? d.lat : null,
+				lng: typeof d.lng === 'number' ? d.lng : null,
 			}))
 			.filter((h) => h.title);
 	});

@@ -11,6 +11,7 @@
     elevLabels,
     elevStats,
   } from '$lib/elevProfile.js';
+  import RouteMap from '$lib/components/RouteMap.svelte';
 
   /** @type {import('./$types').PageData} */
   let { data } = $props();
@@ -255,6 +256,18 @@
 <section class="section section-dark" id="gpx">
   <div class="container">
     <h2 use:fadeIn>{$messages.route.heading}</h2>
+
+    <!-- Interaktive Karte (Leaflet + OSM, nur client-side) -->
+    {#if browser}
+      <div class="route-map-wrap">
+        <RouteMap
+          locale={$locale}
+          checkpointNames={$messages.route.checkpoints ?? []}
+        />
+      </div>
+    {:else}
+      <div class="map-placeholder">🗺️ {$messages.route.mapLoading}</div>
+    {/if}
     <div class="route-grid">
       <div class="route-info" use:fadeIn={{ delay: 80 }}>
         <div class="route-meta-grid">
@@ -729,6 +742,20 @@
   .prose p { color: #94a3b8; margin: 0 0 1rem; }
 
   /* ── route ── */
+  .route-map-wrap {
+    margin-bottom: 2rem;
+  }
+  .map-placeholder {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e293b;
+    border-radius: 12px;
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
   .route-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
