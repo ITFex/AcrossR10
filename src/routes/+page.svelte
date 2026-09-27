@@ -36,8 +36,10 @@
   function parseStat(raw) {
     const m = raw.match(/^([^0-9]*)([0-9][0-9.,]*)(\s*)(.*)$/);
     if (!m) return { prefix: '', num: 0, suffixSpace: '', suffix: raw, formatLocale: undefined, grouped: false };
-    const grouped = m[2].includes('.') || m[2].includes(',');
-    const formatLocale = m[2].includes('.') ? 'de-DE' : (m[2].includes(',') ? 'en-US' : undefined);
+    const isDotGrouped = /^\d{1,3}(?:\.\d{3})+$/.test(m[2]);
+    const isCommaGrouped = /^\d{1,3}(?:,\d{3})+$/.test(m[2]);
+    const grouped = isDotGrouped || isCommaGrouped;
+    const formatLocale = isDotGrouped ? 'de-DE' : (isCommaGrouped ? 'en-US' : undefined);
     const numStr = m[2].replace(/[.,]/g, '');
     return {
       prefix: m[1],
@@ -166,7 +168,7 @@
     };
   }
 
-  function onElevMouseLeave() {
+  function onElevPointerLeave() {
     tooltip = { ...tooltip, visible: false };
   }
 </script>
@@ -289,7 +291,7 @@
           aria-label={$messages.route.elevTitle}
           role="img"
           onpointermove={onElevPointerMove}
-          onpointerleave={onElevMouseLeave}
+          onpointerleave={onElevPointerLeave}
         >
           <!-- background grid (300/500/700/900 m) -->
           {#each Object.entries(elevGrid) as [m, y] (m)}
