@@ -167,7 +167,7 @@ const en = {
     minutes: 'Min',
     seconds: 'Sec',
     over: 'The season has started!',
-    /** ISO date string – first day of next riding season */
+    /** ISO date string – first day of next riding season (+02:00 assumes CEST) */
     eventDate: '2027-05-01T08:00:00+02:00',
   },
   seo: {
