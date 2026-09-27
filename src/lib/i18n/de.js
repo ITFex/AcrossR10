@@ -160,6 +160,16 @@ const de = {
     riderLabel: (name, done) => `${name} · ${done}/10`,
   },
   lang: { switchTo: 'English' },
+  countdown: {
+    heading: 'Saison-Start',
+    days: 'Tage',
+    hours: 'Std',
+    minutes: 'Min',
+    seconds: 'Sek',
+    over: 'Die Saison hat begonnen!',
+    /** ISO date string – first day of next riding season */
+    eventDate: '2027-05-01T08:00:00',
+  },
   seo: {
     title: 'AcrossR10 – 10× über den Rennsteig',
     description: 'Gravel-Challenge: den Rennsteig 10-mal mit dem Gravelbike überqueren. GPX-Download, Streckeninfos, FAQ.',

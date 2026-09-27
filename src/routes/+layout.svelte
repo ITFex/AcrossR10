@@ -11,6 +11,7 @@
 	let menuOpen = $state(false);
 	let session = $derived(/** @type {any} */ (data?.session ?? null));
 	let registrationUrl = $derived(data?.registrationUrl ?? null);
+	let activeSection = $state('');
 
 	const navLinks = [
 		{ href: '#event',   labelKey: 'navEvent' },
@@ -29,6 +30,28 @@
 	function closeMenu() {
 		menuOpen = false;
 	}
+
+	// Active section tracking via IntersectionObserver
+	if (browser) {
+		$effect(() => {
+			const sectionIds = navLinks.map((l) => l.href.slice(1));
+			const observers = sectionIds.map((id) => {
+				const el = document.getElementById(id);
+				if (!el) return null;
+				const obs = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) activeSection = id;
+						});
+					},
+					{ threshold: 0.3 }
+				);
+				obs.observe(el);
+				return obs;
+			});
+			return () => observers.forEach((o) => o?.disconnect());
+		});
+	}
 </script>
 
 <svelte:head>
@@ -41,7 +64,7 @@
 	<a class="nav-brand" href="{base}/#top">AcrossR10</a>
 	<nav class="nav-links" class:open={menuOpen}>
 		{#each navLinks as l}
-			<a href="{base}/{l.href}" onclick={closeMenu}>{$messages.nav[l.labelKey]}</a>
+			<a href="{base}/{l.href}" class:active={activeSection === l.href.slice(1)} onclick={closeMenu}>{$messages.nav[l.labelKey]}</a>
 		{/each}
 		<a href="{base}/leaderboard" class="nav-leaderboard" onclick={closeMenu}>{$messages.nav.navLeaderboard}</a>
 		{#if session?.user}
@@ -123,6 +146,7 @@
 		transition: color 120ms ease;
 	}
 	.nav-links a:hover { color: #f1f5f9; }
+	.nav-links a.active { color: #f97316; }
 	.nav-links .nav-leaderboard { color: #94a3b8; }
 	.nav-links .nav-leaderboard:hover { color: #f97316; }
 	.nav-links .nav-members { color: #f97316; }
