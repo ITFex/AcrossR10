@@ -22,11 +22,9 @@
   }
 
   // ── GPX button shake ──────────────────────────────────────────
-  let gpxShaking = $state(false);
+  let gpxShakeKey = $state(0);
   function shakeGpx() {
-    gpxShaking = false;
-    // force reflow so the class is re-applied
-    if (browser) requestAnimationFrame(() => { gpxShaking = true; });
+    gpxShakeKey += 1;
   }
 
   // ── Count-up for hero stats ───────────────────────────────────
@@ -103,10 +101,11 @@
   }
 
   if (browser) {
-    updateCountdown();
-    const cdInterval = setInterval(updateCountdown, 1000);
-    // clean up when component is destroyed
-    $effect(() => () => clearInterval(cdInterval));
+    $effect(() => {
+      updateCountdown();
+      const cdInterval = setInterval(updateCountdown, 1000);
+      return () => clearInterval(cdInterval);
+    });
   }
 
   // ── Elevation profile tooltip ─────────────────────────────────
@@ -175,7 +174,7 @@
     <div class="hero-stats" use:countUp>
       {#each $messages.stats as s, i}
         <div class="stat">
-          <span class="stat-val">{statDisplays[i] !== '0' ? statDisplays[i] : s.value}</span>
+          <span class="stat-val">{statsStarted ? statDisplays[i] : s.value}</span>
           <span class="stat-label">{s.label}</span>
         </div>
       {/each}
@@ -256,16 +255,17 @@
           {/each}
         </div>
         <p class="route-desc" use:fadeIn={{ delay: 200 }}>{$messages.route.desc}</p>
+        {#key gpxShakeKey}
         <a
           href="{base}/gpx/acrossr10-rennsteig.gpx"
           download
           class="btn-primary gpx-btn"
-          class:shake={gpxShaking}
+          class:shake={gpxShakeKey > 0}
           onclick={shakeGpx}
-          onanimationend={() => (gpxShaking = false)}
         >
           ↓ {$messages.route.download}
         </a>
+        {/key}
         <p class="gpx-hint">{$messages.route.downloadHint}</p>
       </div>
 

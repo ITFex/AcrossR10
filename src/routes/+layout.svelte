@@ -4,6 +4,7 @@
 	import { locale, messages, setLocale } from '$lib/i18n/index.js';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { base } from '$app/paths';
+	import { tick } from 'svelte';
 
 	/** @type {import('./$types').LayoutData} */
 	let { data } = $props();
@@ -35,20 +36,26 @@
 	if (browser) {
 		$effect(() => {
 			const sectionIds = navLinks.map((l) => l.href.slice(1));
-			const observers = sectionIds.map((id) => {
-				const el = document.getElementById(id);
-				if (!el) return null;
-				const obs = new IntersectionObserver(
-					(entries) => {
-						entries.forEach((entry) => {
-							if (entry.isIntersecting) activeSection = id;
-						});
-					},
-					{ threshold: 0.3 }
-				);
-				obs.observe(el);
-				return obs;
+			let observers = /** @type {(IntersectionObserver | null)[]} */ ([]);
+
+			// Use tick() to wait for child page DOM (slots/render) to be mounted
+			tick().then(() => {
+				observers = sectionIds.map((id) => {
+					const el = document.getElementById(id);
+					if (!el) return null;
+					const obs = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (entry.isIntersecting) activeSection = id;
+							});
+						},
+						{ threshold: 0.3 }
+					);
+					obs.observe(el);
+					return obs;
+				});
 			});
+
 			return () => observers.forEach((o) => o?.disconnect());
 		});
 	}
