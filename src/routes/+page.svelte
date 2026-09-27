@@ -30,15 +30,23 @@
   // ── Count-up for hero stats ───────────────────────────────────
   /**
    * Parse the numeric value out of a stat string like "130 km", "3.400 hm", "10×", "~900 m".
-   * Returns { prefix, num, suffix } where num is an integer.
+   * Returns { prefix, num, suffixSpace, suffix, formatLocale, grouped } where num is an integer.
    * @param {string} raw
    */
   function parseStat(raw) {
-    const m = raw.match(/^([^0-9]*)([0-9][0-9.]*)\s*(.*)$/);
-    if (!m) return { prefix: '', num: 0, suffix: raw };
-    // German thousand-separator: "3.400" → 3400
-    const numStr = m[2].replace(/\./g, '');
-    return { prefix: m[1], num: parseInt(numStr, 10), suffix: m[3] };
+    const m = raw.match(/^([^0-9]*)([0-9][0-9.,]*)(\s*)(.*)$/);
+    if (!m) return { prefix: '', num: 0, suffixSpace: '', suffix: raw, formatLocale: undefined, grouped: false };
+    const grouped = m[2].includes('.') || m[2].includes(',');
+    const formatLocale = m[2].includes('.') ? 'de-DE' : (m[2].includes(',') ? 'en-US' : undefined);
+    const numStr = m[2].replace(/[.,]/g, '');
+    return {
+      prefix: m[1],
+      num: parseInt(numStr, 10),
+      suffixSpace: m[3],
+      suffix: m[4],
+      formatLocale,
+      grouped,
+    };
   }
 
   // Display values start at 0, get updated by count-up
@@ -62,11 +70,10 @@
         function tick(now) {
           const t = Math.min((now - start) / duration, 1);
           const ease = 1 - Math.pow(1 - t, 3); // ease-out-cubic
-          statDisplays = parsed.map(({ prefix, num, suffix }) => {
+          statDisplays = parsed.map(({ prefix, num, suffixSpace, suffix, formatLocale, grouped }) => {
             const cur = Math.round(ease * num);
-            // re-add German thousand dot if original had one
-            const fmt = num >= 1000 ? cur.toLocaleString('de-DE') : String(cur);
-            return `${prefix}${fmt}${suffix ? ' ' + suffix : ''}`;
+            const fmt = grouped ? cur.toLocaleString(formatLocale) : String(cur);
+            return `${prefix}${fmt}${suffixSpace}${suffix}`;
           });
           if (t < 1) requestAnimationFrame(tick);
         }
@@ -128,15 +135,18 @@
     return Math.round(elevStats.minEle + (110 - y) / 100 * (elevStats.maxEle - elevStats.minEle));
   }
   function svgXtoKm(x) {
-    return (x / 500 * elevStats.totalKm).toFixed(1);
+    return (x / 500 * elevStats.totalKm).toLocaleString($locale === 'de' ? 'de-DE' : 'en-US', {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
   }
 
   /** @type {SVGSVGElement | null} */
   let elevSvg = $state(null);
   let tooltip = $state({ visible: false, x: 0, y: 0, km: '0', ele: 0 });
 
-  /** @param {MouseEvent} e */
-  function onElevMouseMove(e) {
+  /** @param {PointerEvent} e */
+  function onElevPointerMove(e) {
     if (!elevSvg) return;
     const rect = elevSvg.getBoundingClientRect();
     const svgX = ((e.clientX - rect.left) / rect.width) * 500;
@@ -278,8 +288,8 @@
           class="elev-svg"
           aria-label={$messages.route.elevTitle}
           role="img"
-          onmousemove={onElevMouseMove}
-          onmouseleave={onElevMouseLeave}
+          onpointermove={onElevPointerMove}
+          onpointerleave={onElevMouseLeave}
         >
           <!-- background grid (300/500/700/900 m) -->
           {#each Object.entries(elevGrid) as [m, y] (m)}
@@ -694,6 +704,14 @@
     70%       { transform: translateY(-2px); }
   }
   .btn-bounce:hover { animation: bounce-up 0.4s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-pulse,
+    .shake,
+    .btn-bounce:hover {
+      animation: none !important;
+    }
+  }
 
   /* ── headings ── */
   h2 {

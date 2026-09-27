@@ -168,7 +168,7 @@ const de = {
     seconds: 'Sek',
     over: 'Die Saison hat begonnen!',
     /** ISO date string – first day of next riding season */
-    eventDate: '2027-05-01T08:00:00',
+    eventDate: '2027-05-01T08:00:00+02:00',
   },
   seo: {
     title: 'AcrossR10 – 10× über den Rennsteig',

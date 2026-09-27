@@ -37,9 +37,11 @@
 		$effect(() => {
 			const sectionIds = navLinks.map((l) => l.href.slice(1));
 			let observers = /** @type {(IntersectionObserver | null)[]} */ ([]);
+			let cancelled = false;
 
 			// Use tick() to wait for child page DOM (slots/render) to be mounted
 			tick().then(() => {
+				if (cancelled) return;
 				observers = sectionIds.map((id) => {
 					const el = document.getElementById(id);
 					if (!el) return null;
@@ -54,9 +56,13 @@
 					obs.observe(el);
 					return obs;
 				});
+				if (cancelled) observers.forEach((o) => o?.disconnect());
 			});
 
-			return () => observers.forEach((o) => o?.disconnect());
+			return () => {
+				cancelled = true;
+				observers.forEach((o) => o?.disconnect());
+			};
 		});
 	}
 </script>
